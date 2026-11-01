@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+                 maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#172c24">
+  <title>干支並べ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- 対戦設定画面 -->
+    <section id="setup-screen" class="screen">
+      <div class="setup-panel">
+        <h1>干支並べ</h1>
+        <p class="subtitle">戦略CPU対戦</p>
+
+        <h2>対戦人数</h2>
+        <div class="player-options">
+          <button class="player-option" data-players="2">
+            2人<span>CPU 1人</span>
+          </button>
+          <button class="player-option" data-players="3">
+            3人<span>CPU 2人</span>
+          </button>
+          <button class="player-option active" data-players="4">
+            4人<span>CPU 3人</span>
+          </button>
+        </div>
+
+        <p id="setup-description">
+          4人対戦 ／ 手札13枚ずつ
+        </p>
+
+        <button id="start-button" class="main-button">
+          ゲーム開始
+        </button>
+      </div>
+    </section>
+
+    <!-- ゲーム画面 -->
+    <section id="game-screen" class="screen hidden">
+      <div id="game-board">
+
+        
+<!-- 上部 -->
+<header class="top-area">
+
+  <!-- 左側：戻るボタンと得点 -->
+  <div class="top-left">
+
+    <button id="back-button" class="small-button">
+      戻る
+    </button>
+
+    <div id="color-counts">
+      <span class="count-red">
+        赤 <b id="count-red">0</b>
+      </span>
+
+      <span class="count-blue">
+        青 <b id="count-blue">0</b>
+      </span>
+
+      <span class="count-yellow">
+        黄 <b id="count-yellow">0</b>
+      </span>
+
+      <span class="count-green">
+        緑 <b id="count-green">0</b>
+      </span>
+    </div>
+
+  </div>
+
+  <!-- 中央：CPU2 -->
+  
+<div id="cpu-top"></div>
+
+
+  <!-- 右側：CPU速度 -->
+  <div class="speed-control">
+    <span>CPU速度</span>
+    <select id="cpu-speed">
+      <option value="fast">高速</option>
+      <option value="normal" selected>標準</option>
+      <option value="slow">低速</option>
+    </select>
+  </div>
+
+</header>
+
+
+        <!-- 中央 -->
+        <main class="middle-area">
+
+          <aside id="cpu-left"
+                 class="side-area"></aside>
+
+          <div class="field-area">
+            
+<div id="card-field">
+  <div id="zodiac-field"></div>
+  <div id="cat-cards"></div>
+</div>
+
+
+            <div class="field-footer">
+              <div id="cat-pile">
+                <span>猫</span>
+                <div id="cat-cards"></div>
+              </div>
+
+              <div id="game-message">
+                対戦画面の確認中
+              </div>
+            </div>
+          </div>
+
+          <aside id="cpu-right"
+                 class="side-area"></aside>
+
+        </main>
+
+        <!-- 自分の手札 -->
+        <footer class="bottom-area">
+
+          <div class="hand-header">
+            <div id="my-info"></div>
+
+            <div class="hand-controls">
+              <button id="sort-zodiac"
+                      class="sort-button active">
+                干支順
+              </button>
+              <button id="sort-color"
+                      class="sort-button">
+                色順
+              </button>
+            </div>
+          </div>
+
+          <div class="hand-main">
+            <div id="my-hand"></div>
+
+            <div class="action-buttons">
+              <button id="play-button"
+                      class="action-button">
+                場に出す
+              </button>
+              <button id="pass-button"
+                      class="action-button secondary">
+                カードを渡す
+              </button>
+            </div>
+          </div>
+
+        </footer>
+
+      </div>
+    </section>
+
+  </div>
+
+  
+<!-- 手札公開モーダル -->
+<div id="reveal-overlay" class="hidden">
+  <div class="reveal-panel">
+
+    <h2 id="reveal-title">手札公開</h2>
+
+    <p id="reveal-description"></p>
+
+    <div id="reveal-cards"></div>
+
+    <button id="reveal-close"
+            class="main-button">
+      確認
+    </button>
+
+  </div>
+</div>
+
+
+  <script src="script.js"></script>
+</body>
+</html>

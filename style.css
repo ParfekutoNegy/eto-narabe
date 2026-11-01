@@ -1,0 +1,1388 @@
+
+/* ========================================
+   1. 共通設定
+======================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  font-family:
+    "Yu Gothic",
+    "Hiragino Kaku Gothic ProN",
+    sans-serif;
+
+  background: #172c24;
+  color: #fff;
+
+  touch-action: manipulation;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.screen {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* ========================================
+   2. トップ画面
+   1280 × 720 横向き基準
+======================================== */
+
+#setup-screen {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at center,
+      #365c46,
+      #14261e
+    );
+}
+
+.setup-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  width: 1280px;
+  height: 720px;
+  max-width: none;
+
+  padding: 55px 100px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 0;
+
+  background: #243b30;
+
+  text-align: center;
+
+  transform-origin: top left;
+}
+
+.setup-panel h1 {
+  margin: 0;
+
+  font-size: 70px;
+  letter-spacing: 10px;
+
+  color: #f0d89b;
+}
+
+.setup-panel .subtitle {
+  margin: 12px 0 28px;
+
+  font-size: 22px;
+  color: #c7d6c9;
+}
+
+.setup-panel h2 {
+  margin: 8px 0;
+  font-size: 26px;
+}
+
+.player-options {
+  display: flex;
+
+  width: 650px;
+  gap: 20px;
+
+  margin: 15px 0;
+}
+
+.player-option {
+  flex: 1;
+
+  padding: 20px 12px;
+
+  background: #385342;
+  color: #fff;
+
+  border: 2px solid #6b806e;
+  border-radius: 10px;
+
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.player-option span {
+  display: block;
+
+  margin-top: 5px;
+
+  font-size: 15px;
+  font-weight: normal;
+}
+
+.player-option.active {
+  background: #c6a666;
+  border-color: #f6df9e;
+  color: #25251e;
+}
+
+#setup-description {
+  margin: 12px 0 22px;
+  font-size: 19px;
+}
+
+.main-button {
+  width: 100%;
+
+  padding: 15px;
+
+  background: #d3ae65;
+  color: #24251c;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#start-button {
+  width: 450px;
+
+  padding: 18px;
+
+  font-size: 27px;
+}
+
+
+/* ========================================
+   3. ゲーム全体
+======================================== */
+
+#game-screen {
+  position: fixed;
+  inset: 0;
+
+  overflow: hidden;
+}
+
+#game-board {
+  position: absolute;
+
+  width: 1280px;
+  height: 720px;
+
+  display: grid;
+
+  grid-template-rows:
+    106px
+    400px
+    214px;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      #315a42,
+      #172d23
+    );
+
+  overflow: hidden;
+
+  transform-origin: top left;
+}
+
+
+/* ========================================
+   4. 上部エリア
+   左：戻る・得点
+   中央：CPU2
+   右：CPU速度
+======================================== */
+
+.top-area {
+  display: grid;
+
+  grid-template-columns:
+    420px
+    minmax(0, 1fr)
+    190px;
+
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 8px 20px;
+}
+
+.top-left {
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-width: 0;
+}
+
+.small-button {
+  width: 85px;
+
+  padding: 10px;
+
+  background: #405849;
+  color: white;
+
+  border: 1px solid #a3b4a1;
+  border-radius: 8px;
+}
+
+.top-left #back-button {
+  width: 85px;
+  padding: 6px;
+}
+
+
+/* ========================================
+   5. 各色の得点表示
+======================================== */
+
+#color-counts {
+  position: static;
+
+  display: flex;
+
+  justify-content: flex-start;
+  align-items: center;
+
+  gap: 6px;
+
+  width: auto;
+}
+
+#color-counts span {
+  display: inline-flex;
+
+  justify-content: center;
+  align-items: center;
+
+  min-width: 58px;
+
+  padding: 5px 8px;
+
+  border-radius: 7px;
+
+  color: white;
+
+  font-size: 15px;
+  font-weight: bold;
+
+  text-align: center;
+  white-space: nowrap;
+}
+
+#color-counts b {
+  margin-left: 5px;
+
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.count-red {
+  background: #ad4444;
+}
+
+.count-blue {
+  background: #346da8;
+}
+
+.count-yellow {
+  background: #b79a32;
+}
+
+.count-green {
+  background: #32845b;
+}
+
+
+/* ========================================
+   6. CPUプレイヤーパネル
+======================================== */
+
+.player-panel {
+  background: #2c4637;
+
+  border: 2px solid #708674;
+  border-radius: 12px;
+
+  padding: 12px;
+
+  text-align: center;
+}
+
+.player-panel.active-turn {
+  border-color: #ffe18a;
+  box-shadow: 0 0 18px #f0d16a;
+}
+
+.player-panel.eliminated {
+  opacity: 0.5;
+  filter: grayscale(0.7);
+}
+
+.player-name {
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.player-details {
+  margin-top: 8px;
+
+  font-size: 15px;
+  color: #e0e8dd;
+}
+
+/* 上部中央のCPU */
+#cpu-top {
+  justify-self: center;
+  align-self: center;
+
+  width: 190px;
+}
+
+
+/* ========================================
+   7. CPU速度
+======================================== */
+
+.speed-control {
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-end;
+
+  gap: 6px;
+
+  font-size: 13px;
+}
+
+.top-area .speed-control {
+  justify-self: end;
+}
+
+.speed-control select {
+  width: 110px;
+
+  padding: 7px;
+
+  background: #405849;
+  color: white;
+
+  border: 1px solid #91a58f;
+  border-radius: 7px;
+}
+
+
+/* ========================================
+   8. 中央エリア
+======================================== */
+
+.middle-area {
+  display: grid;
+
+  grid-template-columns:
+    155px
+    minmax(0, 1fr)
+    155px;
+
+  min-height: 0;
+}
+
+.side-area {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+}
+
+.side-area .player-panel {
+  width: 100%;
+}
+
+.field-area {
+  min-width: 0;
+
+  padding: 8px 15px;
+
+  background: #234332;
+
+  border: 2px solid #78916c;
+  border-radius: 15px;
+}
+
+
+/* ========================================
+   9. 干支・黒猫の配置
+======================================== */
+
+#card-field {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 6fr)
+    minmax(0, 1fr);
+
+  column-gap: 5px;
+
+  width: 100%;
+  height: 320px;
+
+  align-items: start;
+}
+
+/* 干支：6列 × 2段 */
+#zodiac-field {
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+
+  grid-template-rows:
+    repeat(2, 150px);
+
+  column-gap: 5px;
+  row-gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+/* 干支の枠 */
+.zodiac-slot {
+  position: relative;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: flex-start;
+
+  min-width: 0;
+
+  padding-top: 5px;
+
+  border: 1px dashed #8ea68b;
+  border-radius: 8px;
+
+  background: #152b2180;
+
+  overflow: hidden;
+}
+
+/* 干支名 */
+.slot-label {
+  position: absolute;
+
+  right: 7px;
+  bottom: 5px;
+
+  font-size: 15px;
+  color: #e8e5cc;
+
+  z-index: 20;
+}
+
+/* 黒猫：亥の右側 */
+#cat-cards {
+  position: relative;
+
+  grid-column: 2;
+  grid-row: 1;
+
+  margin-top: 160px;
+
+  width: 100%;
+  height: 150px;
+
+  border: 1px dashed #bca56c;
+  border-radius: 8px;
+
+  box-sizing: border-box;
+}
+
+/* 場のカード */
+.pile-card {
+  position: absolute;
+
+  width: 74px;
+  height: 104px;
+
+  object-fit: cover;
+
+  border: 1px solid #eee2bd;
+  border-radius: 5px;
+
+  box-shadow: 0 2px 5px #0007;
+}
+
+/* 干支と黒猫のカードサイズを統一 */
+#zodiac-field .pile-card,
+#cat-cards .pile-card {
+  position: absolute;
+
+  left: 5px;
+
+  width: 74px;
+  height: 104px;
+}
+
+
+/* ========================================
+   10. フィールド下部メッセージ
+======================================== */
+
+.field-footer {
+  height: 55px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-start;
+
+  padding: 5px 12px;
+}
+
+#game-message {
+  color: #e6dfb7;
+  font-size: 15px;
+}
+
+
+/* ========================================
+   11. 下部手札エリア
+======================================== */
+
+.bottom-area {
+  min-height: 0;
+
+  padding: 8px 20px;
+
+  background: #14271f;
+
+  border-top: 2px solid #819679;
+}
+
+.hand-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  height: 36px;
+}
+
+#my-info {
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.hand-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.sort-button {
+  padding: 6px 16px;
+
+  background: #385342;
+  color: white;
+
+  border: 1px solid #829780;
+  border-radius: 7px;
+}
+
+.sort-button.active {
+  background: #c9a968;
+  color: #222;
+}
+
+.hand-main {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    145px;
+
+  gap: 15px;
+
+  height: 160px;
+}
+
+#my-hand {
+  position: relative;
+
+  height: 155px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: #203b2c;
+}
+
+
+/* ========================================
+   12. 手札カード
+======================================== */
+
+.hand-card {
+  position: absolute;
+
+  top: 22px;
+
+  width: 96px;
+  height: 132px;
+
+  object-fit: cover;
+
+  border: 1px solid #eadbb7;
+  border-radius: 6px;
+
+  box-shadow: 0 2px 6px #0008;
+
+  transition:
+    top 0.15s,
+    box-shadow 0.15s;
+
+  cursor: pointer;
+}
+
+.hand-card.selected {
+  top: 2px;
+
+  outline: 2px solid #f7d86d;
+
+  box-shadow: 0 0 12px #f4d56d;
+}
+
+
+/* ========================================
+   13. 操作ボタン
+======================================== */
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  gap: 12px;
+}
+
+.action-button {
+  padding: 13px 6px;
+
+  background: #d3ae65;
+  color: #24251c;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.action-button.secondary {
+  background: #789fbd;
+}
+
+.action-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+
+/* ========================================
+   14. 仮カード
+   画像がない場合の表示
+======================================== */
+
+.card-placeholder {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  color: white;
+
+  font-weight: bold;
+  user-select: none;
+
+  border: 1px solid #eadbb7;
+}
+
+.card-placeholder .card-zodiac {
+  font-size: 27px;
+}
+
+.card-placeholder .card-color {
+  margin-top: 7px;
+  font-size: 12px;
+}
+
+.card-placeholder.color-red {
+  background: #bd4545;
+}
+
+.card-placeholder.color-blue {
+  background: #3978bd;
+}
+
+.card-placeholder.color-yellow {
+  background: #b99b2e;
+}
+
+.card-placeholder.color-green {
+  background: #398c61;
+}
+
+.card-placeholder.color-black {
+  background: #272727;
+}
+
+.hand-card.card-placeholder {
+  width: 96px;
+  height: 132px;
+}
+
+.pile-card.card-placeholder {
+  width: 74px;
+  height: 104px;
+}
+
+.pile-card.card-placeholder .card-zodiac {
+  font-size: 24px;
+}
+
+
+/* ========================================
+   15. カード移動アニメーション
+======================================== */
+
+.moving-card {
+  position: fixed;
+
+  z-index: 9999;
+
+  width: 60px;
+  height: 84px;
+
+  margin: 0;
+  padding: 0;
+
+  border-radius: 6px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 5px 16px rgba(0, 0, 0, 0.55);
+
+  pointer-events: none;
+
+  transform-origin: center center;
+
+  will-change:
+    transform,
+    opacity;
+}
+
+.moving-card img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+/* ========================================
+   16. カード裏面
+======================================== */
+
+.card-back {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  border: 3px solid #d4b56f;
+  border-radius: 6px;
+
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #263f63 0px,
+      #263f63 7px,
+      #34557e 7px,
+      #34557e 14px
+    );
+
+  color: #f2dfa6;
+
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 2px;
+
+  text-shadow: 0 1px 3px #000;
+}
+
+.card-back::after {
+  content: "干支";
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 70%;
+  height: 70%;
+
+  border: 2px solid #d4b56f;
+  border-radius: 5px;
+
+  background: rgba(13, 30, 54, 0.85);
+}
+
+
+/* ========================================
+   17. ゲーム終了画面
+======================================== */
+
+#result-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 10000;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  background: #000b;
+}
+
+.result-panel {
+  width: min(90vw, 460px);
+
+  max-height: 85vh;
+  overflow: auto;
+
+  padding: 25px;
+
+  border: 2px solid #d5b36c;
+  border-radius: 15px;
+
+  background: #243b30;
+  color: white;
+
+  text-align: center;
+}
+
+.result-panel h2 {
+  color: #f1d78f;
+  font-size: 28px;
+}
+
+.result-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  padding: 10px;
+
+  border-bottom: 1px solid #6b806e;
+}
+
+.result-row.winner {
+  background: #816a3270;
+  font-weight: bold;
+}
+
+
+/* ========================================
+   18. 手札公開モーダル
+======================================== */
+
+#reveal-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 20000;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px;
+
+  overflow: auto;
+
+  background: #000c;
+}
+
+#reveal-overlay.hidden {
+  display: none !important;
+}
+
+.reveal-panel {
+  width: min(90vw, 850px);
+
+  max-height: 85vh;
+  overflow: auto;
+
+  padding: 24px;
+
+  background: #263f32;
+
+  border: 2px solid #d4b46c;
+  border-radius: 14px;
+
+  text-align: center;
+  color: white;
+}
+
+.reveal-panel h2 {
+  margin: 0 0 12px;
+
+  color: #f1d58b;
+}
+
+#reveal-cards {
+  display: flex;
+
+  flex-wrap: wrap;
+  justify-content: center;
+
+  gap: 8px;
+
+  max-height: 48vh;
+
+  margin: 20px 0;
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.reveal-card {
+  position: relative;
+
+  width: 75px;
+  height: 105px;
+
+  flex-shrink: 0;
+
+  transition: transform 0.25s ease;
+}
+
+.reveal-card.card-placeholder .card-zodiac {
+  font-size: 25px;
+}
+
+.reveal-panel .main-button {
+  max-width: 250px;
+}
+
+
+/* ========================================
+   19. 黒猫の公開画面
+======================================== */
+
+#reveal-cards:has(.cat-reveal-group) {
+  display: flex;
+
+  flex-direction: column;
+  align-items: stretch;
+
+  gap: 14px;
+}
+
+.cat-reveal-group {
+  padding: 12px;
+
+  border: 1px solid #bba36b;
+  border-radius: 9px;
+
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.cat-reveal-title {
+  margin-bottom: 10px;
+
+  color: #f4dc98;
+
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.cat-reveal-card-list {
+  display: flex;
+
+  flex-wrap: wrap;
+  justify-content: center;
+
+  gap: 7px;
+}
+
+
+/* ========================================
+   20. 特殊効果メッセージ
+======================================== */
+
+.special-effect-message {
+  position: fixed;
+
+  left: 50%;
+  top: 35%;
+
+  transform: translate(-50%, -50%);
+
+  z-index: 15000;
+
+  min-width: 300px;
+  max-width: 80vw;
+
+  padding: 18px 28px;
+
+  background: rgba(25, 40, 32, 0.95);
+
+  border: 2px solid #f0d37c;
+  border-radius: 12px;
+
+  color: #fff1bd;
+
+  text-align: center;
+
+  font-size: 23px;
+  font-weight: bold;
+
+  box-shadow: 0 0 25px #000a;
+
+  pointer-events: none;
+}
+
+.special-effect-message.show {
+  animation:
+    specialEffectAppear 0.25s ease-out;
+}
+
+@keyframes specialEffectAppear {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -65%) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%) scale(1);
+  }
+}
+
+
+/* ========================================
+   21. 干支の山の強調表示
+======================================== */
+
+.zodiac-slot.special-highlight {
+  outline: 3px solid #ffe28b;
+
+  box-shadow: 0 0 20px #ffe28b;
+
+  border-radius: 10px;
+}
+
+
+/* ========================================
+   22. スマホ横向き時の公開画面
+======================================== */
+
+@media (max-height: 500px) {
+
+  #reveal-overlay {
+    padding: 8px;
+  }
+
+  #reveal-cards {
+    max-height: 35vh;
+  }
+
+  .cat-reveal-group {
+    padding: 7px;
+  }
+
+  .cat-reveal-title {
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+
+}
+
+
+/* ========================================
+   上部配置の最終調整
+======================================== */
+
+/* 上部全体 */
+.top-area {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 190px 1fr;
+
+  align-items: center;
+
+  gap: 0;
+
+  padding: 8px 20px;
+}
+
+/* 左側の戻る・得点表示 */
+.top-left {
+  position: relative;
+
+  display: flex;
+  flex-direction: row;
+
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 15px;
+
+  min-width: 0;
+}
+
+/* 戻るボタン */
+.top-left #back-button {
+  flex-shrink: 0;
+
+  width: 85px;
+  padding: 8px;
+}
+
+/* 得点表示 */
+#color-counts {
+  position: static;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 6px;
+
+  width: auto;
+  flex-shrink: 0;
+}
+
+#color-counts span {
+  min-width: 52px;
+
+  padding: 6px 7px;
+
+  font-size: 14px;
+}
+
+#color-counts b {
+  margin-left: 3px;
+  font-size: 17px;
+}
+
+/* CPU2をゲーム画面中央に */
+#cpu-top {
+  position: relative;
+
+  grid-column: 2;
+
+  justify-self: center;
+  align-self: center;
+
+  width: 190px;
+}
+
+/* CPU速度を右端に */
+.top-area .speed-control {
+  grid-column: 3;
+
+  justify-self: end;
+  align-self: center;
+}
+
+/* ========================================
+   黒猫の公開画面 コンパクト化
+======================================== */
+
+/* 公開画面全体 */
+#reveal-overlay {
+  padding: 8px;
+  overflow: hidden;
+}
+
+/* 公開パネル */
+.reveal-panel {
+  display: flex;
+  flex-direction: column;
+
+  width: min(94vw, 850px);
+  max-height: calc(100dvh - 16px);
+
+  padding: 12px 18px;
+
+  overflow: hidden;
+}
+
+/* タイトル */
+.reveal-panel h2 {
+  flex-shrink: 0;
+
+  margin: 0 0 5px;
+
+  font-size: 21px;
+}
+
+/* 説明文 */
+#reveal-description {
+  flex-shrink: 0;
+
+  margin: 3px 0 8px;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* カード表示領域 */
+#reveal-cards {
+  flex: 1;
+  min-height: 0;
+
+  max-height: none;
+
+  margin: 5px 0 10px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  overscroll-behavior: contain;
+}
+
+/* 黒猫のプレイヤー別グループ */
+.cat-reveal-group {
+  padding: 6px 8px;
+}
+
+/* 誰から誰へ渡すか */
+.cat-reveal-title {
+  margin-bottom: 5px;
+
+  font-size: 13px;
+}
+
+/* 子カードを小さくする */
+.cat-reveal-card-list .reveal-card {
+  width: 52px;
+  height: 73px;
+}
+
+/* 確認ボタンを下に固定 */
+.reveal-panel .main-button {
+  flex-shrink: 0;
+
+  align-self: center;
+
+  width: 220px;
+  max-width: 100%;
+
+  padding: 9px 15px;
+
+  font-size: 15px;
+}
+
+
+/* プレイヤーの担当色 */
+
+#my-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.my-color-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 40px;
+  padding: 4px 10px;
+
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 17px;
+  color: white;
+}
+
+.my-color-badge.red {
+  background: #bd4040;
+}
+
+.my-color-badge.blue {
+  background: #346da8;
+}
+
+.my-color-badge.yellow {
+  background: #e0b52e;
+  color: #222;
+}
+
+.my-color-badge.green {
+  background: #32845b;
+}
