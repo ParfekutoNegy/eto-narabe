@@ -35,6 +35,54 @@ let selectedCardId = null;
 let handSort = "zodiac";
 let cpuSpeed = "normal";
 
+
+/* =====================================
+   新しく受け取ったカードの強調表示
+===================================== */
+
+const newHandCards = new Map();
+
+const NEW_CARD_HIGHLIGHT_MS = 3000;
+
+function highlightNewHandCards(cards) {
+
+  const sessionId = gameSessionId;
+
+  cards.forEach(card => {
+
+    const expiresAt =
+      Date.now() + NEW_CARD_HIGHLIGHT_MS;
+
+    newHandCards.set(card.id, expiresAt);
+
+    setTimeout(() => {
+
+      // 別のゲームに切り替わっていたら終了
+      if (sessionId !== gameSessionId) {
+        return;
+      }
+
+      // 同じカードの強調表示が更新されていたら残す
+      if (newHandCards.get(card.id) !== expiresAt) {
+        return;
+      }
+
+      newHandCards.delete(card.id);
+
+      document
+        .querySelector(
+          `.hand-card[data-card-id="${card.id}"]`
+        )
+        ?.classList.remove("new-hand-card");
+
+    }, NEW_CARD_HIGHLIGHT_MS);
+
+  });
+
+}
+
+
+
 let cardSequence = 0;
 let busy = false;
 let closeActiveReveal = null;
@@ -97,7 +145,7 @@ function createCard(color, zodiac) {
 
 function getCardImage(card) {
 
-  // 黒猫
+  // 猫
   if (card.zodiac === "猫") {
     return "images/黒13.png";
   }
@@ -194,6 +242,7 @@ $("start-button").addEventListener("click", startGame);
 function startGame() {
 
     gameSessionId++;
+    newHandCards.clear();
 
 clearGameAnimations();
 
@@ -519,6 +568,18 @@ const element =
   createCardElement(card, "hand-card");
 
 element.dataset.cardId = card.id;
+
+
+// 新しく受け取ったカードなら点滅表示
+if (
+  newHandCards.has(card.id) &&
+  newHandCards.get(card.id) > Date.now()
+) {
+
+  element.classList.add("new-hand-card");
+
+}
+
 
     element.style.left =
       `${4 + index * step}px`;
@@ -1129,7 +1190,7 @@ function evaluateCpuCard(player, card) {
 
   if (card.zodiac === "猫") {
 
-    points += 5;
+    points -= 100;
 
     const myRats = player.hand.filter(
       item => item.zodiac === "子"
@@ -1151,7 +1212,12 @@ function evaluateCpuCard(player, card) {
 
 
 
+
 function chooseCpuPlay(player) {
+
+  // =====================================
+  // 1. 出せるカードを取得
+  // =====================================
 
   let candidates = player.hand.filter(
     card => canPlayCard(card)
@@ -1165,11 +1231,81 @@ function chooseCpuPlay(player) {
         card.color === "赤" &&
         card.zodiac === "亥"
     );
+
   }
 
   if (candidates.length === 0) {
     return null;
   }
+
+  // =====================================
+  // 2. ゲーム終了カードを判定
+  // =====================================
+
+  const safeCards = [];
+
+  const winningCards = [];
+
+  const endingCards = [];
+
+  candidates.forEach(card => {
+
+    // カードを出した後の場を予測
+    const nextField = simulateCpuPlay(card);
+
+    // 12種類の干支がそろうか
+    const endsGame = isFieldComplete(nextField);
+
+    if (!endsGame) {
+
+      // ゲームが終了しないカード
+      safeCards.push(card);
+
+      return;
+    }
+
+    // ゲームが終了する場合の勝者
+    const winner = getPredictedWinner(nextField);
+
+    if (winner.id === player.id) {
+
+      // 自分が勝利するカード
+      winningCards.push(card);
+
+    } else {
+
+      // 自分以外が勝利するカード
+      endingCards.push(card);
+
+    }
+
+  });
+
+  // =====================================
+  // 3. 使用候補を決定
+  // =====================================
+
+  if (winningCards.length > 0) {
+
+    // 自分が勝てるなら終了を優先
+    candidates = winningCards;
+
+  } else if (safeCards.length > 0) {
+
+    // 勝てない場合は終了しないカードを優先
+    candidates = safeCards;
+
+  } else {
+
+    // 出せるカードがすべて終了カードなら
+    // ゲーム終了を許可
+    candidates = endingCards;
+
+  }
+
+  // =====================================
+  // 4. 従来の戦略評価
+  // =====================================
 
   const evaluated = candidates.map(card => ({
     card,
@@ -1180,17 +1316,28 @@ function chooseCpuPlay(player) {
     (a, b) => b.points - a.points
   );
 
+  // =====================================
+  // 5. 判断ログ
+  // =====================================
+
   console.log(
     "CPU行動評価",
     player.name,
-    evaluated.map(item => ({
-      card: item.card.color + item.card.zodiac,
-      points: Math.round(item.points)
-    }))
+    {
+      safeCards: safeCards.length,
+      winningCards: winningCards.length,
+      endingCards: endingCards.length,
+      evaluated: evaluated.map(item => ({
+        card: item.card.color + item.card.zodiac,
+        points: Math.round(item.points)
+      }))
+    }
   );
 
   return evaluated[0].card;
+
 }
+
 
 
 
@@ -1241,7 +1388,7 @@ function chooseCpuPass(player) {
 
     // 猫は状況によって渡す
     if (card.zodiac === "猫") {
-      points += 5;
+      points -= 100;
     }
 
     points += Math.random() * 3;
@@ -1396,7 +1543,7 @@ if (!moved || !isCurrentGame(sessionId)) {
   );
 
   // =====================================
-  // 黒猫
+  // 猫
   // =====================================
 
   if (card.zodiac === "猫") {
@@ -1407,7 +1554,7 @@ if (!moved || !isCurrentGame(sessionId)) {
 
     await resolveCatEffect(player);
 
-    // 黒猫の効果中にゲームが変わった場合
+    // 猫の効果中にゲームが変わった場合
     if (!isCurrentGame(sessionId)) return;
 
   } else {
@@ -1556,8 +1703,9 @@ async function rotatePile(zodiac) {
 
 
 /* ========================================
-   黒猫の特殊効果
+   猫の特殊効果
 ======================================== */
+
 
 
 async function resolveCatEffect(actor) {
@@ -1573,11 +1721,11 @@ async function resolveCatEffect(actor) {
   }
 
   // =====================================
-  // 黒猫の効果メッセージ
+  // 猫の効果メッセージ
   // =====================================
 
   await showSpecialEffect(
-    "黒猫の効果！ 子カードを逆方向へ渡します",
+    "猫の効果！ 子カードを逆方向へ渡します",
     1000
   );
 
@@ -1621,6 +1769,7 @@ async function resolveCatEffect(actor) {
       to: previous,
       cards: [...rats]
     });
+
   });
 
   // =====================================
@@ -1643,13 +1792,16 @@ async function resolveCatEffect(actor) {
   // 4. カード移動アニメーション
   // =====================================
 
+  const moved = await animateCatTransfers(
+    transfers
+  );
 
-const moved = await animateCatTransfers(transfers);
-
-if (!moved || !isCurrentGame(sessionId)) {
-  return;
-}
-
+  if (
+    !moved ||
+    !isCurrentGame(sessionId)
+  ) {
+    return;
+  }
 
   // =====================================
   // 5. 全員の手札から子を取り除く
@@ -1666,6 +1818,7 @@ if (!moved || !isCurrentGame(sessionId)) {
       transfer.from.hand.filter(
         card => !ids.has(card.id)
       );
+
   });
 
   // =====================================
@@ -1678,6 +1831,19 @@ if (!moved || !isCurrentGame(sessionId)) {
     transfer.to.hand.push(
       ...transfer.cards
     );
+
+    // ===================================
+    // 新しく自分が受け取った子カードを強調
+    // ===================================
+
+    if (transfer.to.id === 0) {
+
+      highlightNewHandCards(
+        transfer.cards
+      );
+
+    }
+
   });
 
   // =====================================
@@ -1704,6 +1870,7 @@ if (!moved || !isCurrentGame(sessionId)) {
   if (!isCurrentGame(sessionId)) {
     return;
   }
+
 }
 
 
@@ -1765,6 +1932,15 @@ if (!moved || !isCurrentGame(sessionId)) {
   // =====================================
 
   next.hand.push(card);
+
+  
+// 自分がカードを受け取った場合のみ強調表示
+if (next.id === 0) {
+
+  highlightNewHandCards([card]);
+
+}
+
 
   // =====================================
   // 脱落判定
@@ -2097,6 +2273,32 @@ function getElementCenter(element) {
 
 
 
+/* =====================================
+   移動カードの向きを補正
+===================================== */
+
+function adjustMovingCardRotation(moving) {
+
+  const isPortrait =
+    window.innerHeight > window.innerWidth;
+
+  if (!isPortrait) {
+    return;
+  }
+
+  // カード本体だけを回転させる
+  // 移動用要素の transform は変更しない
+
+  const cardContent = moving.firstElementChild;
+
+  if (!cardContent) {
+    return;
+  }
+
+  cardContent.style.transform = "rotate(90deg)";
+  cardContent.style.transformOrigin = "center center";
+}
+
 
 /* ========================================
    カード移動アニメーション
@@ -2222,9 +2424,12 @@ async function animateCardMove(
   moving.style.left = `${start.x - 30}px`;
   moving.style.top = `${start.y - 42}px`;
 
-  document.body.appendChild(moving);
+document.body.appendChild(moving);
 
-  activeAnimations.add(moving);
+// スマホ縦持ち時のカード向きを補正
+adjustMovingCardRotation(moving);
+
+activeAnimations.add(moving);
 
   // =====================================
   // 6. 移動距離
@@ -2682,7 +2887,7 @@ async function highlightZodiacPile(zodiac) {
 
 
 /* ========================================
-   黒猫専用：子カード公開画面
+   猫専用：子カード公開画面
 ======================================== */
 
 
@@ -2714,7 +2919,7 @@ function showCatRevealModal(transfers) {
     // =====================================
 
     $("reveal-title").textContent =
-      "黒猫の効果";
+      "猫の効果";
 
     $("reveal-description").textContent =
       "各プレイヤーの子カードを公開します。"
@@ -2823,7 +3028,7 @@ function showCatRevealModal(transfers) {
 
 
 /* ========================================
-   黒猫：子カード移動アニメーション
+   猫：子カード移動アニメーション
 ======================================== */
 
 
@@ -2899,9 +3104,12 @@ async function animateCatTransfers(transfers) {
       moving.style.top =
         `${start.y - 42 - offset}px`;
 
-      document.body.appendChild(moving);
+document.body.appendChild(moving);
 
-      activeAnimations.add(moving);
+// 猫の効果による移動カードも向きを補正
+adjustMovingCardRotation(moving);
+
+activeAnimations.add(moving);
 
       const dx = end.x - start.x;
       const dy = end.y - start.y;
@@ -3041,6 +3249,7 @@ function stopCurrentGame() {
 
   // 古い非同期処理を無効化
   gameSessionId++;
+  newHandCards.clear();
 
   gameOver = true;
 
@@ -3168,3 +3377,73 @@ function updateColorCounts() {
   $("count-yellow").textContent = counts["黄"];
   $("count-green").textContent = counts["緑"];
 }
+
+
+/* =====================================
+   特殊カード説明画面
+===================================== */
+
+function openSpecialRules() {
+
+  const overlay = $("special-rules-overlay");
+
+  if (!overlay) {
+    return;
+  }
+
+  overlay.classList.remove("hidden");
+}
+
+
+function closeSpecialRules() {
+
+  const overlay = $("special-rules-overlay");
+
+  if (!overlay) {
+    return;
+  }
+
+  overlay.classList.add("hidden");
+}
+
+
+/* =====================================
+   ボタンのイベント登録
+===================================== */
+
+$("special-rules-button").addEventListener(
+  "click",
+  openSpecialRules
+);
+
+$("special-rules-close").addEventListener(
+  "click",
+  closeSpecialRules
+);
+
+
+/* =====================================
+   ルール説明画面
+===================================== */
+
+function openRules() {
+
+  $("rules-overlay").classList.remove("hidden");
+
+}
+
+function closeRules() {
+
+  $("rules-overlay").classList.add("hidden");
+
+}
+
+$("rules-button").addEventListener(
+  "click",
+  openRules
+);
+
+$("rules-close").addEventListener(
+  "click",
+  closeRules
+);
