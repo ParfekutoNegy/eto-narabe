@@ -3018,3 +3018,29 @@ button {
   }
 
 }
+/* =====================================
+   ゲーム開始案内を一回り小さくする
+===================================== */
+
+/* 案内ウィンドウ */
+.first-turn-guide-box {
+  padding: 12px 22px;
+  border-width: 2px;
+}
+
+/* ゲーム開始！ */
+.first-turn-guide-title {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+/* 赤の亥を場に出してください */
+.first-turn-guide-text {
+  font-size: 20px;
+}
+
+/* 手札の赤い亥を選択してください */
+.first-turn-guide-sub {
+  font-size: 12px;
+  margin-top: 5px;
+}
