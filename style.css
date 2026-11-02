@@ -2929,3 +2929,92 @@ button {
   }
 
 }
+
+/* =====================================
+   ルール説明画面
+   スマホ横持ち専用の調整
+===================================== */
+
+@media screen and (orientation: landscape)
+       and (max-height: 600px) {
+
+  /* 説明画面全体 */
+  #rules-overlay .rules-panel {
+    width: min(900px, 96vw);
+    max-width: 96vw;
+    height: 94dvh;
+    max-height: 94dvh;
+    padding: 10px 16px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* タイトル */
+  #rules-overlay .rules-panel h2 {
+    font-size: 18px;
+    margin: 0 0 6px;
+    flex-shrink: 0;
+  }
+
+  /* 説明文の表示領域を広げる */
+  #rules-overlay .rules-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* 下部の案内と閉じるボタン */
+  #rules-overlay .rules-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+
+    position: relative;
+    width: 100%;
+    height: 36px;
+    min-height: 36px;
+    padding: 4px 0 0;
+    margin: 0;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
+  /* スクロール案内 */
+  #rules-overlay .rules-scroll-hint {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    width: auto;
+    margin: 0;
+    padding: 0;
+
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  /* 閉じるボタン */
+  #rules-overlay #rules-close {
+    position: relative;
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    height: 28px;
+    min-height: 28px;
+
+    margin: 0;
+    padding: 3px 8px;
+
+    font-size: 12px;
+    line-height: 1.2;
+    flex: 0 0 80px;
+  }
+
+}
