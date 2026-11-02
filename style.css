@@ -1943,3 +1943,989 @@ button {
   -webkit-user-select: none;
   user-select: none;
 }
+
+/* =====================================
+   終了盤面確認モード
+===================================== */
+
+/* =====================================
+   リザルトに戻るボタン
+   酉のカードの下付近
+===================================== */
+
+#return-result-button {
+
+  position: absolute;
+
+  /* 盤面の左からの位置 */
+  left: 50%;
+
+  /* 盤面の上からの位置 */
+  top: 70%;
+
+  transform: translate(-50%, -50%);
+
+  z-index: 500;
+
+  padding: 10px 18px;
+
+  background: #d3ae65;
+  color: #24251c;
+
+  border: 2px solid #f1d58b;
+  border-radius: 9px;
+
+  font-size: 28px;
+  font-weight: bold;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+
+/* リザルトのボタン間隔 */
+.result-panel .main-button {
+
+  display: block;
+
+  width: 100%;
+
+  touch-action: manipulation;
+
+}
+
+
+
+/* =====================================
+   リザルト画面 縦長コンパクト版
+===================================== */
+
+#result-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 8px;
+  box-sizing: border-box;
+
+  background: rgba(0, 0, 0, 0.72);
+}
+
+/* リザルト本体 */
+#result-overlay .result-panel {
+
+  width: min(90vw, 340px);
+
+  max-height: calc(100dvh - 16px);
+
+  padding: 17px 20px 18px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow: hidden;
+
+  border: 2px solid #d5b36c;
+  border-radius: 14px;
+
+  background: #243b30;
+  color: #ffffff;
+
+  text-align: center;
+}
+
+/* タイトル */
+#result-overlay .result-panel h2 {
+
+  margin: 0 0 6px;
+
+  font-size: 21px;
+  line-height: 1.2;
+
+  color: #f1d78f;
+}
+
+/* 勝者 */
+#result-overlay .result-panel h3 {
+
+  margin: 0 0 14px;
+
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+/* 得点一覧 */
+#result-overlay .result-row {
+
+  width: 100%;
+
+  min-height: 28px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 15px 10px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #63786c;
+
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+/* 勝者の行 */
+#result-overlay .result-row.winner {
+
+  background: rgba(213, 179, 108, 0.24);
+
+  font-weight: bold;
+}
+
+/* プレイヤー名 */
+#result-overlay .result-row span:first-child {
+
+  flex: 1;
+  width: auto;
+  min-width: 0;
+
+  text-align: left;
+}
+
+/* 得点 */
+#result-overlay .result-row span:last-child {
+
+  width: 42px;
+  flex-shrink: 0;
+
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ボタン */
+#result-overlay .result-panel .main-button {
+
+  display: block;
+
+  width: 100%;
+  min-height: 36px;
+
+  padding: 7px 12px;
+
+  margin: 10px 0 0 !important;
+
+  box-sizing: border-box;
+
+  border-radius: 9px;
+
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1.2;
+
+  touch-action: manipulation;
+}
+
+/* 画面の高さが低い場合 */
+@media (max-height: 380px) {
+
+  #result-overlay .result-panel {
+
+    padding: 10px 16px 12px;
+  }
+
+  #result-overlay .result-panel h2 {
+
+    margin-bottom: 3px;
+    font-size: 19px;
+  }
+
+  #result-overlay .result-panel h3 {
+
+    margin-bottom: 7px;
+    font-size: 14px;
+  }
+
+  #result-overlay .result-row {
+
+    min-height: 23px;
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+
+  #result-overlay .result-panel .main-button {
+
+    min-height: 10px;
+    padding: 5px 10px;
+
+    margin-top: 6px !important;
+
+    font-size: 18px;
+  }
+}
+
+/* 非表示を確実に適用 */
+#result-overlay.hidden,
+#return-result-button.hidden {
+  display: none !important;
+}
+
+/* =====================================
+   リザルト画面 3ボタン対応
+===================================== */
+
+#result-overlay .result-panel {
+  width: min(90vw, 340px);
+  max-height: calc(100dvh - 12px);
+  padding: 12px 18px;
+}
+
+/* ボタン共通 */
+#result-overlay .result-panel .main-button {
+  width: 100%;
+  min-height: 32px;
+
+  margin: 7px 0 0 !important;
+  padding: 6px 10px;
+
+  font-size: 13px;
+  line-height: 1.2;
+
+  box-sizing: border-box;
+}
+
+/* 最後のホームボタンだけ少し落ち着いた色 */
+#result-overlay .result-panel .main-button:last-child {
+  background: #52685a;
+  color: #ffffff;
+  border: 1px solid #8da393;
+}
+
+/* 高さが低い画面 */
+@media (max-height: 380px) {
+
+  #result-overlay .result-panel {
+    padding: 8px 14px;
+  }
+
+  #result-overlay .result-panel h3 {
+    margin-bottom: 5px;
+  }
+
+  #result-overlay .result-row {
+    min-height: 21px;
+    padding: 2px 8px;
+  }
+
+  #result-overlay .result-panel .main-button {
+    min-height: 28px;
+    margin-top: 5px !important;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+}
+
+/* =====================================
+   リザルト画面 細長いレイアウト
+===================================== */
+
+/* リザルト全体 */
+#result-overlay .result-panel {
+
+  width: min(90vw, 230px);
+
+  max-height: calc(100dvh - 12px);
+
+  padding: 18px 12px;
+
+  box-sizing: border-box;
+
+}
+
+/* タイトル */
+#result-overlay .result-panel h2 {
+
+  font-size: 20px;
+  margin-bottom: 8px;
+
+}
+
+/* 勝者表示 */
+#result-overlay .result-panel h3 {
+
+  font-size: 13px;
+  margin-bottom: 16px;
+
+}
+
+/* プレイヤー得点 */
+#result-overlay .result-row {
+
+  width: 100%;
+
+  min-height: 30px;
+
+  padding: 6px 4px;
+
+  gap: 6px;
+
+  font-size: 12px;
+
+}
+
+/* 名前 */
+#result-overlay .result-row span:first-child {
+
+  flex: 1;
+  min-width: 0;
+
+  text-align: left;
+  white-space: nowrap;
+
+}
+
+/* 得点 */
+#result-overlay .result-row span:last-child {
+
+  width: 30px;
+
+  text-align: right;
+  white-space: nowrap;
+
+}
+
+/* 3つのボタン */
+#result-overlay .result-panel .main-button {
+
+  width: 100%;
+
+  min-height: 36px;
+
+  margin-top: 10px !important;
+
+  padding: 7px 6px;
+
+  font-size: 12px;
+
+  border-radius: 8px;
+
+}
+
+/* 高さが低いスマホ横画面 */
+@media (max-height: 380px) {
+
+  #result-overlay .result-panel {
+    padding: 10px 12px;
+  }
+
+  #result-overlay .result-panel h2 {
+    margin-bottom: 4px;
+    font-size: 18px;
+  }
+
+  #result-overlay .result-panel h3 {
+    margin-bottom: 7px;
+    font-size: 12px;
+  }
+
+  #result-overlay .result-row {
+    min-height: 23px;
+    padding: 3px 4px;
+    font-size: 11px;
+  }
+
+  #result-overlay .result-panel .main-button {
+    min-height: 29px;
+    margin-top: 5px !important;
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+
+}
+
+/* =====================================
+   猫の効果メッセージ
+   スマホ縦持ち時は90度回転
+===================================== */
+
+@media (orientation: portrait) {
+
+  .special-effect-message {
+
+    position: fixed;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(90deg);
+
+    transform-origin: center center;
+
+    min-width: 0;
+    width: max-content;
+    max-width: calc(100dvh - 40px);
+
+    padding: 12px 20px;
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+  }
+
+}
+
+/* =====================================
+   猫の効果メッセージ
+   縦画面で回転前の表示を防止
+===================================== */
+
+@media (orientation: portrait) {
+
+  .special-effect-message.show {
+
+    animation: none !important;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(90deg) !important;
+
+  }
+
+}
+
+/* =====================================
+   猫の効果
+   カード公開欄の横スクロール対応
+===================================== */
+
+#reveal-cards:has(.cat-reveal-group) {
+
+  display: flex;
+
+  flex-direction: row;
+  flex-wrap: nowrap;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  min-width: 0;
+  width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding: 8px 4px 12px;
+
+  box-sizing: border-box;
+
+  -webkit-overflow-scrolling: touch;
+
+}
+
+/* プレイヤーごとの枠 */
+
+#reveal-cards .cat-reveal-group {
+
+  flex: 0 0 164px;
+
+  width: 164px;
+
+  box-sizing: border-box;
+
+}
+
+/* 確認ボタンは縮まない */
+
+#reveal-overlay .reveal-panel > .main-button {
+
+  flex-shrink: 0;
+
+}
+
+/* =====================================
+   猫の効果
+   4人分を横一列に収める
+===================================== */
+
+/* カード公開エリア */
+
+#reveal-cards:has(.cat-reveal-group) {
+
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 8px;
+
+  width: 100%;
+  min-width: 0;
+
+  overflow-x: hidden;
+  overflow-y: hidden;
+
+  padding: 8px 0;
+
+  box-sizing: border-box;
+
+}
+
+/* プレイヤーごとの枠 */
+
+#reveal-cards .cat-reveal-group {
+
+  width: 100%;
+  min-width: 0;
+
+  padding: 8px 4px;
+
+  box-sizing: border-box;
+
+}
+
+/* 誰から誰へ渡すか */
+
+#reveal-cards .cat-reveal-title {
+
+  font-size: 11px;
+
+  text-align: center;
+
+  white-space: nowrap;
+
+  margin-bottom: 6px;
+
+}
+
+/* カードを中央に表示 */
+
+#reveal-cards .cat-reveal-card-list {
+
+  display: flex;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 4px;
+
+}
+
+/* カードサイズ */
+
+#reveal-cards .cat-reveal-card-list .reveal-card {
+
+  width: 48px;
+  height: 68px;
+
+  flex-shrink: 0;
+
+}
+
+/* 確認ボタン */
+
+#reveal-overlay .reveal-panel > .main-button {
+
+  flex-shrink: 0;
+
+}
+
+/* =====================================
+   ルール説明画面の操作性改善
+===================================== */
+
+/* 説明部分 */
+
+#rules-overlay .rules-content {
+  flex: 1;
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: auto;
+  scrollbar-color: #d4ad65 #263d32;
+
+  padding-right: 12px;
+
+  overscroll-behavior: contain;
+}
+
+/* スクロールバー */
+
+#rules-overlay .rules-content::-webkit-scrollbar {
+  width: 9px;
+}
+
+#rules-overlay .rules-content::-webkit-scrollbar-track {
+  background: #263d32;
+  border-radius: 10px;
+}
+
+#rules-overlay .rules-content::-webkit-scrollbar-thumb {
+  background: #d4ad65;
+  border-radius: 10px;
+  border: 2px solid #263d32;
+}
+
+/* 下部エリア */
+
+#rules-overlay .rules-footer {
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 7px;
+
+  padding-top: 8px;
+
+  border-top: 1px solid #8d7954;
+}
+
+/* スクロール案内 */
+
+#rules-overlay .rules-scroll-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  color: #f2d18b;
+  font-size: 12px;
+  font-weight: bold;
+
+  text-align: center;
+}
+
+/* 下向き矢印 */
+
+#rules-overlay .rules-scroll-arrow {
+  display: inline-block;
+
+  animation: rulesArrowMove 1.2s ease-in-out infinite;
+}
+
+@keyframes rulesArrowMove {
+  0%, 100% {
+    transform: translateY(-2px);
+  }
+
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+/* 閉じるボタンを小さく */
+
+#rules-overlay #rules-close {
+  width: 140px;
+  min-width: 0;
+  max-width: 140px;
+
+  min-height: 34px;
+
+  margin: 0;
+  padding: 7px 12px;
+
+  font-size: 13px;
+  border-radius: 8px;
+
+  flex-shrink: 0;
+}
+
+/* 高さの小さい横画面 */
+
+@media (max-height: 420px) {
+
+  #rules-overlay .rules-footer {
+    gap: 4px;
+    padding-top: 5px;
+  }
+
+  #rules-overlay .rules-scroll-hint {
+    font-size: 10px;
+  }
+
+  #rules-overlay #rules-close {
+    min-height: 29px;
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+}
+
+/* =====================================
+   ルール説明 スクロール案内の色
+===================================== */
+
+#rules-overlay .rules-scroll-hint {
+
+  color: #654315;
+
+  font-size: 13px;
+  font-weight: bold;
+
+}
+
+/* 下向き矢印 */
+
+#rules-overlay .rules-scroll-arrow {
+
+  color: #a16a17;
+
+  font-size: 16px;
+
+}
+
+/* =====================================
+   ルール説明画面 下部レイアウト
+===================================== */
+
+/* 下部を横並びにする */
+
+#rules-overlay .rules-footer {
+
+  display: flex;
+  flex-direction: row;
+
+  align-items: center;
+  justify-content: flex-end;
+
+  position: relative;
+
+  min-height: 42px;
+
+  padding: 6px 0 0;
+
+}
+
+/* スクロール案内は中央 */
+
+#rules-overlay .rules-scroll-hint {
+
+  position: absolute;
+
+  left: 50%;
+  transform: translateX(-50%);
+
+  white-space: nowrap;
+
+  margin: 0;
+
+}
+
+/* 閉じるボタンは右端 */
+
+#rules-overlay #rules-close {
+
+  width: 110px;
+  min-width: 0;
+  max-width: 110px;
+
+  margin: 0;
+
+  padding: 7px 12px;
+
+  font-size: 13px;
+
+  flex-shrink: 0;
+
+}
+
+
+/* =====================================
+   特殊カード説明
+   スマホでも5枚横並び
+===================================== */
+
+/* 5枚を必ず横一列 */
+
+#special-rules-overlay .special-rules-list {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 6px;
+
+  width: 100%;
+  min-width: 0;
+
+  overflow-x: hidden;
+  overflow-y: hidden;
+
+}
+
+/* 各カードの枠 */
+
+#special-rules-overlay .special-rule-item {
+
+  min-width: 0;
+
+  padding: 5px 3px;
+
+}
+
+/* カード画像 */
+
+#special-rules-overlay .special-rule-item img {
+
+  width: auto;
+  height: 75px;
+
+  max-width: 100%;
+
+  object-fit: contain;
+
+}
+
+/* カード名 */
+
+#special-rules-overlay .special-rule-item h3 {
+
+  font-size: 12px;
+
+  margin: 5px 0;
+
+}
+
+/* 説明文 */
+
+#special-rules-overlay .special-rule-item p {
+
+  font-size: 10px;
+
+  line-height: 1.35;
+
+  margin: 0;
+
+  overflow-wrap: anywhere;
+
+}
+
+/* ウィンドウ内の余白 */
+
+#special-rules-overlay .special-rules-panel {
+
+  width: min(1100px, 96%);
+
+  padding: 10px;
+
+}
+
+/* タイトル */
+
+#special-rules-overlay .special-rules-panel h2 {
+
+  font-size: 20px;
+
+  margin-bottom: 8px;
+
+}
+
+/* 閉じるボタン */
+
+#special-rules-overlay #special-rules-close {
+
+  width: 120px;
+  max-width: 120px;
+
+  padding: 7px 12px;
+
+  font-size: 13px;
+
+}
+
+/* =====================================
+   最初の赤の亥 案内
+===================================== */
+
+#first-turn-guide {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  pointer-events: none;
+}
+
+#first-turn-guide.hidden {
+  display: none;
+}
+
+.first-turn-guide-box {
+  background: rgba(18, 43, 31, 0.96);
+
+  border: 3px solid #e3b64e;
+  border-radius: 12px;
+
+  padding: 16px 30px;
+
+  text-align: center;
+
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+}
+
+.first-turn-guide-title {
+  color: #f1cf73;
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.first-turn-guide-text {
+  color: #ffffff;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.first-turn-guide-sub {
+  color: #e6d5a6;
+  font-size: 15px;
+  margin-top: 8px;
+}
+
+/* スマホ縦持ち時は90度回転 */
+
+@media (orientation: portrait) {
+
+  #first-turn-guide {
+    left: 50%;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+
+    width: 100dvh;
+    height: 100dvw;
+
+    transform: translate(-50%, -50%) rotate(90deg);
+    transform-origin: center;
+  }
+
+  .first-turn-guide-box {
+    padding: 12px 20px;
+  }
+
+}

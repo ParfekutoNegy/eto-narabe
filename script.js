@@ -244,6 +244,9 @@ function startGame() {
     gameSessionId++;
     newHandCards.clear();
 
+
+    
+
 clearGameAnimations();
 
 if (closeActiveReveal) {
@@ -276,6 +279,16 @@ turnProcessing = false;
     playerCount === 2
       ? COLORS.slice(0, 3)
       : COLORS;
+
+// 2人プレイでは緑の得点欄を非表示
+const greenScore = document.querySelector(
+  ".count-green"
+);
+
+if (greenScore) {
+  greenScore.style.display =
+    playerCount === 2 ? "none" : "";
+}
 
   const assignedColors =
     shuffle(availableColors).slice(0, playerCount);
@@ -415,7 +428,6 @@ myInfo.innerHTML = `
   </span>
   <span>
     ／ 手札：${me.hand.length}枚
-    ／ 得点：${calculateScore(me.color)}点
     ${me.eliminated ? "／ 脱落" : ""}
   </span>
 `;
@@ -693,19 +705,34 @@ async function startTurn() {
   turnProcessing = false;
   busy = false;
 
+
   renderAll();
+
+  // 最初の赤の亥の案内を更新
+  updateFirstTurnGuide();
 
   // =====================================
   // プレイヤーの手番
   // =====================================
 
+
   if (player.id === 0) {
 
-    if (firstTurn) {
-      showMessage("赤の亥を場に出してください");
-    } else {
-      showMessage("カードを選んで場に出してください");
-    }
+
+if (firstTurn) {
+
+  showMessage(
+    "赤の亥からゲームが始まります。赤の亥を場に出してください。"
+  );
+
+} else {
+
+  showMessage(
+    "カードを選んで場に出してください"
+  );
+
+}
+
 
     if (!hasPlayableCard(player)) {
 
@@ -1130,6 +1157,38 @@ function evaluateCpuCard(player, card) {
     }
   }
 
+  // =====================================
+  // 自分の色を山の一番下に置くリスク
+  // =====================================
+
+  if (
+    card.zodiac !== "猫" &&
+    card.color === myColor &&
+    field[card.zodiac].length === 0
+  ) {
+
+    // 現在、場にある干支の種類数
+    const zodiacCount = ZODIACS.filter(
+      zodiac => field[zodiac].length > 0
+    ).length;
+
+    // 序盤ほど上書きされるリスクを高く評価
+    if (zodiacCount <= 3) {
+
+      points -= 60;
+
+    } else if (zodiacCount <= 7) {
+
+      points -= 20;
+
+    } else {
+
+      points -= 10;
+
+    }
+
+  }
+
 
   // =====================================
   // 5. 新しい干支を出す判断
@@ -1190,14 +1249,14 @@ function evaluateCpuCard(player, card) {
 
   if (card.zodiac === "猫") {
 
-    points -= 100;
+    points += 10;
 
     const myRats = player.hand.filter(
       item => item.zodiac === "子"
     ).length;
 
     // 自分の子を手放す場合は少し慎重
-    points -= myRats * 8;
+    points -= myRats * 20;
   }
 
 
@@ -1205,7 +1264,7 @@ function evaluateCpuCard(player, card) {
   // 8. わずかなランダム性
   // =====================================
 
-  points += Math.random() * 2;
+  points += Math.random() * 3;
 
   return points;
 }
@@ -1614,18 +1673,30 @@ if (!moved || !isCurrentGame(sessionId)) {
 
   }
 
+
   // =====================================
   // 最終確認
   // =====================================
 
   if (!isCurrentGame(sessionId)) return;
 
-  firstTurn = false;
+  // 赤の亥を出したら最初の手番を終了
+  if (
+    firstTurn &&
+    card.color === "赤" &&
+    card.zodiac === "亥"
+  ) {
+    firstTurn = false;
+  }
+
+  // 中央の案内表示を更新
+  updateFirstTurnGuide();
 
   updateEliminations();
 
   renderAll();
 }
+
 
 
 
@@ -2065,6 +2136,7 @@ function advanceTurn() {
 // ========================================
 
 
+
 function checkGameEnd() {
 
   if (gameOver) {
@@ -2076,12 +2148,11 @@ function checkGameEnd() {
     zodiac => field[zodiac].length > 0
   );
 
-  // 脱落していないプレイヤー数
+  // 脱落していないプレイヤー
   const activePlayers = players.filter(
     player => !player.eliminated
   );
 
-  // 12種類完成、または残り1人で終了
   if (
     zodiacComplete ||
     activePlayers.length <= 1
@@ -2089,15 +2160,37 @@ function checkGameEnd() {
 
     gameOver = true;
     busy = false;
+    turnProcessing = false;
 
+    // 最終盤面を描画
     renderAll();
-    showResult();
+
+    // 現在のゲーム番号を保存
+    const sessionId = gameSessionId;
+
+    // 3秒間、終了時の盤面を表示
+    setTimeout(() => {
+
+      // 別のゲームが始まっていたら表示しない
+      if (sessionId !== gameSessionId) {
+        return;
+      }
+
+      // ゲーム画面が非表示なら表示しない
+      if ($("game-screen").classList.contains("hidden")) {
+        return;
+      }
+
+      showResult();
+
+    }, 3000);
 
     return true;
   }
 
   return false;
 }
+
 
 
 // ========================================
@@ -2148,9 +2241,19 @@ function getWinner() {
 // 結果画面
 // ========================================
 
+
+
 function showResult() {
 
+  // 重複表示を防止
+  $("result-overlay")?.remove();
+  $("return-result-button")?.remove();
+
   const winner = getWinner();
+
+  // =====================================
+  // リザルト画面
+  // =====================================
 
   const overlay = document.createElement("div");
   overlay.id = "result-overlay";
@@ -2166,6 +2269,10 @@ function showResult() {
     `勝者：${winner.name}（${winner.color}）`;
 
   panel.append(title, winnerText);
+
+  // =====================================
+  // プレイヤーの得点
+  // =====================================
 
   players.forEach(player => {
 
@@ -2186,24 +2293,131 @@ function showResult() {
 
     row.append(name, score);
     panel.appendChild(row);
+
   });
+
+  // =====================================
+  // 盤面を見る
+  // =====================================
+
+  const viewBoard = document.createElement("button");
+  viewBoard.className = "main-button";
+  viewBoard.textContent = "盤面を見る";
+
+  panel.appendChild(viewBoard);
+
+  // =====================================
+  // もう一度遊ぶ
+  // =====================================
 
   const restart = document.createElement("button");
   restart.className = "main-button";
-  restart.style.marginTop = "20px";
   restart.textContent = "もう一度遊ぶ";
+
+  panel.appendChild(restart);
+
+  // =====================================
+  // ホーム画面に戻る
+  // =====================================
+
+  const home = document.createElement("button");
+  home.className = "main-button";
+  home.textContent = "ホーム画面に戻る";
+
+  panel.appendChild(home);
+
+  // =====================================
+  // リザルトに戻るボタン
+  // =====================================
+
+  const returnButton = document.createElement("button");
+
+  returnButton.id = "return-result-button";
+  returnButton.type = "button";
+  returnButton.textContent = "ゲーム結果画面に戻る";
+  returnButton.classList.add("hidden");
+
+  $("game-board").appendChild(returnButton);
+
+  // =====================================
+  // 盤面確認
+  // =====================================
+
+  viewBoard.addEventListener("click", () => {
+
+    overlay.classList.add("hidden");
+    returnButton.classList.remove("hidden");
+
+  });
+
+  // =====================================
+  // リザルトへ戻る
+  // =====================================
+
+  returnButton.addEventListener("click", () => {
+
+    returnButton.classList.add("hidden");
+    overlay.classList.remove("hidden");
+
+  });
+
+  // =====================================
+  // もう一度遊ぶ
+  // =====================================
 
   restart.addEventListener("click", () => {
 
+    returnButton.remove();
     overlay.remove();
+
     startGame();
+
   });
 
-  panel.appendChild(restart);
-  overlay.appendChild(panel);
+  // =====================================
+  // ホーム画面へ戻る
+  // =====================================
 
+  home.addEventListener("click", () => {
+
+    // 現在の対戦を終了
+    gameOver = true;
+    busy = false;
+    turnProcessing = false;
+
+    // 以前のゲームの非同期処理を無効化
+    gameSessionId++;
+
+    clearGameAnimations();
+
+    if (closeActiveReveal) {
+      closeActiveReveal();
+    }
+
+    // リザルト関連の表示を削除
+    returnButton.remove();
+    overlay.remove();
+
+    // ゲーム画面を閉じる
+    $("game-screen").classList.add("hidden");
+
+    // ホーム画面を表示
+    $("setup-screen").classList.remove("hidden");
+
+    // 画面レイアウトを更新
+    resizeSetup();
+
+  });
+
+  // =====================================
+  // リザルト表示
+  // =====================================
+
+  overlay.appendChild(panel);
   document.body.appendChild(overlay);
+
 }
+
 
 // ========================================
 // 手札公開
@@ -2550,6 +2764,31 @@ function renderAll() {
 function showMessage(message) {
   $("game-message").textContent = message;
 }
+
+
+function updateFirstTurnGuide() {
+
+  const guide =
+    document.getElementById("first-turn-guide");
+
+  if (!guide) return;
+
+  const player = players[currentPlayerIndex];
+
+  const shouldShow =
+    !gameOver &&
+    firstTurn &&
+    player?.id === 0 &&
+    phase === "play";
+
+  guide.classList.toggle(
+    "hidden",
+    !shouldShow
+  );
+
+}
+
+
 
 // ========================================
 // 並び替え
