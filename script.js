@@ -2862,8 +2862,15 @@ function resizeGame() {
 
   if (!game) return;
 
-  const width = document.documentElement.clientWidth;
-  const height = document.documentElement.clientHeight;
+const viewport = window.visualViewport;
+
+const width = viewport
+  ? viewport.width
+  : window.innerWidth;
+
+const height = viewport
+  ? viewport.height
+  : window.innerHeight;
 
   if (width <= 0 || height <= 0) return;
 
@@ -3507,8 +3514,15 @@ function resizeSetup() {
 
   if (!panel) return;
 
-  const width = document.documentElement.clientWidth;
-  const height = document.documentElement.clientHeight;
+const viewport = window.visualViewport;
+
+const width = viewport
+  ? viewport.width
+  : window.innerWidth;
+
+const height = viewport
+  ? viewport.height
+  : window.innerHeight;
 
   if (width <= 0 || height <= 0) return;
 
@@ -3686,15 +3700,23 @@ function updateScreenLayout() {
 
 function scheduleScreenLayout() {
 
-  // まず現在のサイズで更新
+  // 回転直後に更新
   updateScreenLayout();
 
-  // 回転直後のサイズ変動が落ち着いてから再更新
+  // 前回の予約を取り消す
   clearTimeout(layoutUpdateTimer);
 
+  // 画面回転後のサイズ変化に対応
   layoutUpdateTimer = setTimeout(() => {
+
     updateScreenLayout();
-  }, 250);
+
+    // 最終的な表示領域で再計算
+    requestAnimationFrame(() => {
+      updateScreenLayout();
+    });
+
+  }, 500);
 
 }
 
