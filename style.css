@@ -1919,3 +1919,27 @@ button {
   max-width: 100%;
   margin: 20px auto 0;
 }
+
+
+/* =====================================
+   iPhone ホーム画面
+   タッチ操作の安定化
+===================================== */
+
+button,
+select,
+.hand-card {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* カード画像がタッチ対象を妨げないようにする */
+.hand-card img {
+  pointer-events: none;
+}
+
+/* ボタン内の文字を選択させない */
+button {
+  -webkit-user-select: none;
+  user-select: none;
+}

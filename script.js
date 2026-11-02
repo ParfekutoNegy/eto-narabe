@@ -2616,74 +2616,59 @@ $("back-button").addEventListener("click", () => {
 // 画面サイズ
 // ========================================
 
+
 function resizeGame() {
 
   const game = $("game-board");
 
-  const viewport = window.visualViewport;
+  if (!game) return;
 
-  const width = viewport
-    ? viewport.width
-    : window.innerWidth;
-
-  const height = viewport
-    ? viewport.height
-    : window.innerHeight;
+  const width = document.documentElement.clientWidth;
+  const height = document.documentElement.clientHeight;
 
   if (width <= 0 || height <= 0) return;
 
   const baseWidth = 1280;
   const baseHeight = 720;
 
-  if (height > width) {
+  const portrait = height > width;
 
-    const scale = Math.min(
-      width / baseHeight,
-      height / baseWidth
-    );
+  const scale = portrait
+    ? Math.min(
+        width / baseHeight,
+        height / baseWidth
+      )
+    : Math.min(
+        width / baseWidth,
+        height / baseHeight
+      );
 
-    const renderedWidth = baseHeight * scale;
-    const renderedHeight = baseWidth * scale;
+  if (portrait) {
 
-    const x = (width - renderedWidth) / 2;
-    const y = (height - renderedHeight) / 2;
+    const displayWidth = baseHeight * scale;
+    const displayHeight = baseWidth * scale;
+
+    const x = (width - displayWidth) / 2;
+    const y = (height - displayHeight) / 2;
 
     game.style.transform =
-      `translate(${x + renderedWidth}px, ${y}px) ` +
+      `translate(${x + displayWidth}px, ${y}px) ` +
       `rotate(90deg) scale(${scale})`;
 
   } else {
 
-    const scale = Math.min(
-      width / baseWidth,
-      height / baseHeight
-    );
+    const displayWidth = baseWidth * scale;
+    const displayHeight = baseHeight * scale;
 
-    const x = (width - baseWidth * scale) / 2;
-    const y = (height - baseHeight * scale) / 2;
+    const x = (width - displayWidth) / 2;
+    const y = (height - displayHeight) / 2;
 
     game.style.transform =
       `translate(${x}px, ${y}px) scale(${scale})`;
+
   }
 
-  if (!$("game-screen").classList.contains("hidden")) {
-    renderHand();
-  }
 }
-
-window.addEventListener("resize", resizeGame);
-
-window.addEventListener("orientationchange", () => {
-  setTimeout(resizeGame, 200);
-});
-
-if (window.visualViewport) {
-  window.visualViewport.addEventListener(
-    "resize",
-    resizeGame
-  );
-}
-
 
 
 function showRevealModal(title, description, cards) {
@@ -3274,6 +3259,7 @@ function stopCurrentGame() {
 }
 
 
+
 function resizeSetup() {
 
   const panel = document.querySelector(
@@ -3282,15 +3268,8 @@ function resizeSetup() {
 
   if (!panel) return;
 
-  const viewport = window.visualViewport;
-
-  const width = viewport
-    ? viewport.width
-    : window.innerWidth;
-
-  const height = viewport
-    ? viewport.height
-    : window.innerHeight;
+  const width = document.documentElement.clientWidth;
+  const height = document.documentElement.clientHeight;
 
   if (width <= 0 || height <= 0) return;
 
@@ -3314,11 +3293,11 @@ function resizeSetup() {
     const displayWidth = baseHeight * scale;
     const displayHeight = baseWidth * scale;
 
-    const left = (width - displayWidth) / 2;
-    const top = (height - displayHeight) / 2;
+    const x = (width - displayWidth) / 2;
+    const y = (height - displayHeight) / 2;
 
     panel.style.transform =
-      `translate(${left + displayWidth}px, ${top}px) ` +
+      `translate(${x + displayWidth}px, ${y}px) ` +
       `rotate(90deg) scale(${scale})`;
 
   } else {
@@ -3326,25 +3305,16 @@ function resizeSetup() {
     const displayWidth = baseWidth * scale;
     const displayHeight = baseHeight * scale;
 
-    const left = (width - displayWidth) / 2;
-    const top = (height - displayHeight) / 2;
+    const x = (width - displayWidth) / 2;
+    const y = (height - displayHeight) / 2;
 
     panel.style.transform =
-      `translate(${left}px, ${top}px) scale(${scale})`;
+      `translate(${x}px, ${y}px) scale(${scale})`;
+
   }
+
 }
 
-window.addEventListener(
-  "resize",
-  resizeSetup
-);
-
-window.visualViewport?.addEventListener(
-  "resize",
-  resizeSetup
-);
-
-resizeSetup();
 
 
 function updateColorCounts() {
@@ -3447,3 +3417,67 @@ $("rules-close").addEventListener(
   "click",
   closeRules
 );
+
+
+/* =====================================
+   iPhone ホーム画面対応
+   画面サイズ変更をまとめて処理
+===================================== */
+
+let layoutUpdateFrame = null;
+let layoutUpdateTimer = null;
+
+function updateScreenLayout() {
+
+  // 同じフレーム内の重複更新を防止
+  if (layoutUpdateFrame !== null) {
+    cancelAnimationFrame(layoutUpdateFrame);
+  }
+
+  layoutUpdateFrame = requestAnimationFrame(() => {
+
+    layoutUpdateFrame = null;
+
+    resizeSetup();
+    resizeGame();
+
+  });
+
+}
+
+function scheduleScreenLayout() {
+
+  // まず現在のサイズで更新
+  updateScreenLayout();
+
+  // 回転直後のサイズ変動が落ち着いてから再更新
+  clearTimeout(layoutUpdateTimer);
+
+  layoutUpdateTimer = setTimeout(() => {
+    updateScreenLayout();
+  }, 250);
+
+}
+
+window.addEventListener(
+  "resize",
+  scheduleScreenLayout
+);
+
+window.addEventListener(
+  "orientationchange",
+  scheduleScreenLayout
+);
+
+window.visualViewport?.addEventListener(
+  "resize",
+  scheduleScreenLayout
+);
+
+window.addEventListener(
+  "pageshow",
+  scheduleScreenLayout
+);
+
+// 初回表示
+scheduleScreenLayout();
