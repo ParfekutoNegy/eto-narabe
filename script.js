@@ -2851,21 +2851,31 @@ $("back-button").addEventListener("click", () => {
 function resizeGame() {
 
   const game = $("game-board");
+  const screen = $("game-screen");
 
-  if (!game) return;
+  if (!game || !screen) return;
 
-  const width = document.documentElement.clientWidth
-    || window.innerWidth;
+  // =====================================
+  // ゲーム画面の実際の表示領域
+  // =====================================
 
-  const height = document.documentElement.clientHeight
-    || window.innerHeight;
+  const width = screen.clientWidth;
+  const height = screen.clientHeight;
 
   if (width <= 0 || height <= 0) return;
+
+  // =====================================
+  // 基準サイズ
+  // =====================================
 
   const baseWidth = 1280;
   const baseHeight = 720;
 
   const portrait = height > width;
+
+  // =====================================
+  // 拡大縮小率
+  // =====================================
 
   const scale = portrait
     ? Math.min(
@@ -2877,8 +2887,9 @@ function resizeGame() {
         height / baseHeight
       );
 
-  // 配置を一度リセット
-  game.style.transform = "none";
+  // =====================================
+  // 配置
+  // =====================================
 
   if (portrait) {
 
@@ -2900,17 +2911,12 @@ function resizeGame() {
     const x = (width - displayWidth) / 2;
     const y = (height - displayHeight) / 2;
 
-    // iPhone PWAの表示位置を補正
-    const offsetTop =
-      window.visualViewport?.offsetTop ?? 0;
-
     game.style.transform =
-      `translate(${x}px, ${y + offsetTop}px) scale(${scale})`;
+      `translate(${x}px, ${y}px) scale(${scale})`;
 
   }
 
 }
-
 
 function showRevealModal(title, description, cards) {
 
