@@ -3702,20 +3702,40 @@ function updateScreenLayout() {
 
 function scheduleScreenLayout() {
 
+  // =====================================
   // 回転直後に更新
+  // =====================================
+
+  resetPagePosition();
+
   updateScreenLayout();
 
+  // =====================================
   // 前回の予約を取り消す
+  // =====================================
+
   clearTimeout(layoutUpdateTimer);
 
+  // =====================================
   // 画面回転後のサイズ変化に対応
+  // =====================================
+
   layoutUpdateTimer = setTimeout(() => {
+
+    resetPagePosition();
 
     updateScreenLayout();
 
+    // =====================================
     // 最終的な表示領域で再計算
+    // =====================================
+
     requestAnimationFrame(() => {
+
+      resetPagePosition();
+
       updateScreenLayout();
+
     });
 
   }, 500);
@@ -3900,3 +3920,16 @@ if ("serviceWorker" in navigator) {
   setInterval(update, 500);
 
 })();
+
+/* =====================================
+   iPhone 画面位置の補正
+===================================== */
+
+function resetPagePosition() {
+
+  window.scrollTo(0, 0);
+
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+
+}
