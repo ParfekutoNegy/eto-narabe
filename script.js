@@ -3927,3 +3927,69 @@ window.addEventListener("orientationchange", () => {
   setTimeout(resizeGame, 600);
 
 });
+
+/* =====================================
+   ゲーム画面の位置診断
+===================================== */
+
+(function () {
+
+  const debug = document.createElement("div");
+
+  debug.style.cssText = `
+    position: fixed;
+    top: 5px;
+    left: 5px;
+    z-index: 999999;
+    padding: 8px;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    font-size: 12px;
+    white-space: pre-line;
+    pointer-events: none;
+  `;
+
+  document.body.appendChild(debug);
+
+  function update() {
+
+    const screen =
+      document.getElementById("game-screen");
+
+    const board =
+      document.getElementById("game-board");
+
+    if (
+      !screen ||
+      !board ||
+      screen.classList.contains("hidden")
+    ) {
+      debug.style.display = "none";
+      return;
+    }
+
+    debug.style.display = "block";
+
+    const screenRect =
+      screen.getBoundingClientRect();
+
+    const boardRect =
+      board.getBoundingClientRect();
+
+    const viewport =
+      window.visualViewport;
+
+    debug.textContent =
+      `inner: ${innerWidth} × ${innerHeight}\n` +
+      `client: ${document.documentElement.clientWidth} × ${document.documentElement.clientHeight}\n` +
+      `visual: ${Math.round(viewport?.width ?? 0)} × ${Math.round(viewport?.height ?? 0)}\n` +
+      `offsetTop: ${Math.round(viewport?.offsetTop ?? 0)}\n` +
+      `screen: ${Math.round(screenRect.top)} ～ ${Math.round(screenRect.bottom)}\n` +
+      `board: ${Math.round(boardRect.top)} ～ ${Math.round(boardRect.bottom)}\n` +
+      `scale: ${getComputedStyle(board).transform}`;
+
+  }
+
+  setInterval(update, 500);
+
+})();
