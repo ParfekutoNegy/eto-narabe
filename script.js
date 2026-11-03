@@ -579,7 +579,9 @@ function showCpuColorPicker(playerId) {
   panel.append(title, buttons, cancel);
   overlay.appendChild(panel);
 
-  document.body.appendChild(overlay);
+document
+  .getElementById("game-board")
+  .appendChild(overlay);
 
 }
 
