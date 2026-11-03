@@ -3841,95 +3841,7 @@ if ("serviceWorker" in navigator) {
 }
 
 /* =====================================
-   タッチ診断・最新版
-===================================== */
-
-(function () {
-
-  const debug = document.createElement("div");
-
-  debug.id = "touch-debug";
-
-  debug.style.cssText = `
-    position: fixed;
-    left: 8px;
-    top: 8px;
-    z-index: 999999;
-    padding: 10px;
-    background: rgba(0,0,0,0.9);
-    color: white;
-    font-size: 14px;
-    white-space: pre-line;
-    pointer-events: none;
-  `;
-
-  document.body.appendChild(debug);
-
-  let count = 0;
-
-  document.addEventListener("touchstart", event => {
-
-    const gameScreen =
-      document.getElementById("game-screen");
-
-    if (
-      !gameScreen ||
-      gameScreen.classList.contains("hidden")
-    ) {
-      return;
-    }
-
-    const touch = event.touches[0];
-    if (!touch) return;
-
-    count++;
-
-    const x = touch.clientX;
-    const y = touch.clientY;
-
-    const target = document.elementFromPoint(x, y);
-
-    const button =
-      document.getElementById("play-button");
-
-    const rect = button?.getBoundingClientRect();
-
-    // ★ 追加：表示領域の情報
-    const viewport = window.visualViewport;
-
-    debug.textContent =
-      `診断回数：${count}\n` +
-      `タッチ：${Math.round(x)}, ${Math.round(y)}\n` +
-      `判定：${target?.id || target?.className || "なし"}\n` +
-      `ボタン中心：${
-        rect
-          ? Math.round(rect.left + rect.width / 2) +
-            ", " +
-            Math.round(rect.top + rect.height / 2)
-          : "なし"
-      }\n` +
-      `innerHeight：${window.innerHeight}\n` +
-      `clientHeight：${document.documentElement.clientHeight}\n` +
-      `visualHeight：${viewport?.height ?? "なし"}\n` +
-      `offsetTop：${viewport?.offsetTop ?? "なし"}`;
-
-  }, {
-    capture: true,
-    passive: true
-  });
-
-})();
-
-window.addEventListener("orientationchange", () => {
-
-  setTimeout(resizeGame, 100);
-  setTimeout(resizeGame, 300);
-  setTimeout(resizeGame, 600);
-
-});
-
-/* =====================================
-   ゲーム画面の位置診断
+   画面位置の原因調査
 ===================================== */
 
 (function () {
@@ -3938,8 +3850,8 @@ window.addEventListener("orientationchange", () => {
 
   debug.style.cssText = `
     position: fixed;
-    top: 5px;
     left: 5px;
+    top: 5px;
     z-index: 999999;
     padding: 8px;
     background: rgba(0,0,0,0.9);
@@ -3953,41 +3865,36 @@ window.addEventListener("orientationchange", () => {
 
   function update() {
 
-    const screen =
-      document.getElementById("game-screen");
+    const html = document.documentElement;
+    const body = document.body;
+    const screen = document.getElementById("game-screen");
+    const board = document.getElementById("game-board");
 
-    const board =
-      document.getElementById("game-board");
-
-    if (
-      !screen ||
-      !board ||
-      screen.classList.contains("hidden")
-    ) {
+    if (!screen || !board ||
+        screen.classList.contains("hidden")) {
       debug.style.display = "none";
       return;
     }
 
     debug.style.display = "block";
 
-    const screenRect =
-      screen.getBoundingClientRect();
+    const position = element => {
+      const rect = element.getBoundingClientRect();
+      return `${Math.round(rect.top)}～${Math.round(rect.bottom)}`;
+    };
 
-    const boardRect =
-      board.getBoundingClientRect();
-
-    const viewport =
-      window.visualViewport;
+    const parent = screen.offsetParent;
 
     debug.textContent =
-      `inner: ${innerWidth} × ${innerHeight}\n` +
-      `client: ${document.documentElement.clientWidth} × ${document.documentElement.clientHeight}\n` +
-      `visual: ${Math.round(viewport?.width ?? 0)} × ${Math.round(viewport?.height ?? 0)}\n` +
-      `offsetTop: ${Math.round(viewport?.offsetTop ?? 0)}\n` +
-      `screen: ${Math.round(screenRect.top)} ～ ${Math.round(screenRect.bottom)}\n` +
-      `board: ${Math.round(boardRect.top)} ～ ${Math.round(boardRect.bottom)}\n` +
-      `scale: ${getComputedStyle(board).transform}`;
-
+      `html: ${position(html)}\n` +
+      `body: ${position(body)}\n` +
+      `screen: ${position(screen)}\n` +
+      `board: ${position(board)}\n` +
+      `parent: ${parent?.id || parent?.tagName || "なし"}\n` +
+      `scrollY: ${window.scrollY}\n` +
+      `visualTop: ${window.visualViewport?.offsetTop ?? "なし"}\n` +
+      `pageTop: ${window.visualViewport?.pageTop ?? "なし"}\n` +
+      `innerHeight: ${window.innerHeight}`;
   }
 
   setInterval(update, 500);
