@@ -3923,7 +3923,6 @@ document.addEventListener("touchstart", event => {
   );
 
 }, {
-  once: true,
   capture: true,
   passive: true
 });
