@@ -3831,3 +3831,56 @@ if ("serviceWorker" in navigator) {
   });
 
 }
+
+/* =====================================
+   タッチ位置の診断（一時的）
+===================================== */
+
+(function () {
+
+  const debug = document.createElement("div");
+
+  debug.style.cssText = `
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 999999;
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+    padding: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    pointer-events: none;
+    white-space: pre-line;
+    max-width: 90vw;
+  `;
+
+  document.body.appendChild(debug);
+
+  document.addEventListener(
+    "touchstart",
+    event => {
+
+      const touch = event.touches[0];
+
+      if (!touch) return;
+
+      const x = touch.clientX;
+      const y = touch.clientY;
+
+      const target =
+        document.elementFromPoint(x, y);
+
+      const button =
+        target?.closest("button");
+
+      debug.textContent =
+        `タッチ位置：${Math.round(x)}, ${Math.round(y)}\n` +
+        `判定要素：${target?.id || target?.className || target?.tagName}\n` +
+        `ボタン：${button?.textContent.trim() || "なし"}`;
+
+    },
+    { capture: true, passive: true }
+  );
+
+})();
