@@ -581,6 +581,23 @@ const element =
 
 element.dataset.cardId = card.id;
 
+// =====================================
+// 最初の赤の亥を発光させる
+// =====================================
+
+if (
+  firstTurn &&
+  currentPlayerIndex === 0 &&
+  card.color === "赤" &&
+  card.zodiac === "亥"
+) {
+
+  element.classList.add(
+    "first-red-boar"
+  );
+
+}
+
 
 // 新しく受け取ったカードなら点滅表示
 if (
@@ -708,9 +725,6 @@ async function startTurn() {
 
   renderAll();
 
-  // 最初の赤の亥の案内を更新
-  updateFirstTurnGuide();
-
   // =====================================
   // プレイヤーの手番
   // =====================================
@@ -722,7 +736,7 @@ async function startTurn() {
 if (firstTurn) {
 
   showMessage(
-    "赤の亥からゲームが始まります。赤の亥を場に出してください。"
+    "赤の亥（い）からゲームが始まります。赤の亥（い）を場に出してください。"
   );
 
 } else {
@@ -770,6 +784,11 @@ if (firstTurn) {
 
   busy = true;
   turnProcessing = true;
+
+  // CPUの行動中であることを表示
+  showMessage(
+    "CPUが行動中"
+  );
 
   updateButtons();
 
@@ -912,7 +931,7 @@ $("pass-button").addEventListener("click", async () => {
   if (!card) {
 
     showMessage(
-      "渡すカードを選んでください"
+      "左隣に渡すカードを選んでください"
     );
 
     return;
@@ -1637,10 +1656,10 @@ if (!moved || !isCurrentGame(sessionId)) {
       field["戌"].length >= 2
     ) {
 
-      await showSpecialEffect(
-        "申の効果！ 戌の山を入れ替えます",
-        800
-      );
+await showSpecialEffect(
+  "申（さる）の効果！\n戌（いぬ）の一番上のカードを一番下へ移動します",
+  2000
+);
 
       if (!isCurrentGame(sessionId)) return;
 
@@ -1659,10 +1678,10 @@ if (!moved || !isCurrentGame(sessionId)) {
       field["申"].length >= 2
     ) {
 
-      await showSpecialEffect(
-        "戌の効果！ 申の山を入れ替えます",
-        800
-      );
+await showSpecialEffect(
+  "戌（いぬ）の効果！\n申（さる）の一番上のカードを一番下へ移動します",
+  2000
+);
 
       if (!isCurrentGame(sessionId)) return;
 
@@ -1688,9 +1707,6 @@ if (!moved || !isCurrentGame(sessionId)) {
   ) {
     firstTurn = false;
   }
-
-  // 中央の案内表示を更新
-  updateFirstTurnGuide();
 
   updateEliminations();
 
@@ -1795,10 +1811,10 @@ async function resolveCatEffect(actor) {
   // 猫の効果メッセージ
   // =====================================
 
-  await showSpecialEffect(
-    "猫の効果！ 子カードを逆方向へ渡します",
-    1000
-  );
+await showSpecialEffect(
+  "猫（ねこ）の効果！\n全員の子（ね）を逆方向へ渡します",
+  2000
+);
 
   if (!isCurrentGame(sessionId)) {
     return;
@@ -1934,8 +1950,8 @@ async function resolveCatEffect(actor) {
   // =====================================
 
   await showSpecialEffect(
-    "子カードの移動が完了しました",
-    700
+    "子（ね）の移動が完了しました",
+    1000
   );
 
   if (!isCurrentGame(sessionId)) {
@@ -2766,30 +2782,6 @@ function showMessage(message) {
 }
 
 
-function updateFirstTurnGuide() {
-
-  const guide =
-    document.getElementById("first-turn-guide");
-
-  if (!guide) return;
-
-  const player = players[currentPlayerIndex];
-
-  const shouldShow =
-    !gameOver &&
-    firstTurn &&
-    player?.id === 0 &&
-    phase === "play";
-
-  guide.classList.toggle(
-    "hidden",
-    !shouldShow
-  );
-
-}
-
-
-
 // ========================================
 // 並び替え
 // ========================================
@@ -3150,10 +3142,10 @@ function showCatRevealModal(transfers) {
     // =====================================
 
     $("reveal-title").textContent =
-      "猫の効果";
+      "猫（ねこ）の効果";
 
     $("reveal-description").textContent =
-      "各プレイヤーの子カードを公開します。"
+      "各プレイヤーの子（ね）を公開します。"
       + "カードは通常とは逆方向に渡されます。";
 
     container.replaceChildren();
@@ -3167,7 +3159,7 @@ function showCatRevealModal(transfers) {
       const empty = document.createElement("p");
 
       empty.textContent =
-        "子カードを持っているプレイヤーはいません。";
+        "子（ね）を持っているプレイヤーはいません。";
 
       container.appendChild(empty);
 
@@ -3742,3 +3734,65 @@ window.addEventListener(
 
 // 初回表示
 scheduleScreenLayout();
+
+/* =====================================
+   ルール説明のスクロール案内
+===================================== */
+
+function updateRulesScrollHint() {
+
+  const content =
+    document.querySelector(".rules-content");
+
+  const hint =
+    document.querySelector(".rules-scroll-hint");
+
+  if (!content || !hint) {
+    return;
+  }
+
+  // 現在のスクロール位置
+  const scrollTop = content.scrollTop;
+
+  // スクロール可能な最大位置
+  const maxScroll =
+    content.scrollHeight - content.clientHeight;
+
+  // 一番下まで到達したか判定
+  const isBottom =
+    maxScroll <= 0 ||
+    scrollTop >= maxScroll - 5;
+
+  // 一番下なら非表示
+  hint.classList.toggle(
+    "hidden",
+    isBottom
+  );
+
+}
+
+
+// =====================================
+// スクロール時に判定
+// =====================================
+
+document.querySelector(".rules-content")
+  ?.addEventListener(
+    "scroll",
+    updateRulesScrollHint,
+    { passive: true }
+  );
+
+
+// =====================================
+// ルール画面を開いたときにも判定
+// =====================================
+
+document.getElementById("rules-button")
+  ?.addEventListener("click", () => {
+
+    requestAnimationFrame(() => {
+      updateRulesScrollHint();
+    });
+
+  });

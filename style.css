@@ -1,5 +1,12 @@
 
 /* ========================================
+   干支並べ style.css
+   重複整理版
+   基準画面：1280 × 720
+======================================== */
+
+
+/* ========================================
    1. 共通設定
 ======================================== */
 
@@ -20,7 +27,7 @@ body {
     sans-serif;
 
   background: #172c24;
-  color: #fff;
+  color: #ffffff;
 
   touch-action: manipulation;
 }
@@ -28,10 +35,14 @@ body {
 button,
 select {
   font: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button {
   cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .hidden {
@@ -43,10 +54,23 @@ button {
   height: 100%;
 }
 
+.main-button {
+  width: 100%;
+  padding: 15px;
+
+  background: #d3ae65;
+  color: #24251c;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 20px;
+  font-weight: bold;
+}
+
 
 /* ========================================
    2. トップ画面
-   1280 × 720 横向き基準
 ======================================== */
 
 #setup-screen {
@@ -87,7 +111,6 @@ button {
   border-radius: 0;
 
   background: #243b30;
-
   text-align: center;
 
   transform-origin: top left;
@@ -129,7 +152,7 @@ button {
   padding: 20px 12px;
 
   background: #385342;
-  color: #fff;
+  color: #ffffff;
 
   border: 2px solid #6b806e;
   border-radius: 10px;
@@ -158,43 +181,36 @@ button {
   font-size: 19px;
 }
 
-.main-button {
-  width: 100%;
-
-  padding: 15px;
-
-  background: #d3ae65;
-  color: #24251c;
-
-  border: none;
-  border-radius: 10px;
-
-  font-size: 20px;
-  font-weight: bold;
-}
-
 #start-button {
   width: 450px;
-
   padding: 18px;
-
   font-size: 27px;
+}
+
+#rules-button {
+  display: block;
+
+  width: 260px;
+  max-width: 100%;
+
+  margin: 20px auto 0;
 }
 
 
 /* ========================================
-   3. ゲーム全体
+   3. ゲーム画面全体
 ======================================== */
 
 #game-screen {
   position: fixed;
   inset: 0;
-
   overflow: hidden;
 }
 
 #game-board {
   position: absolute;
+  left: 0;
+  top: 0;
 
   width: 1280px;
   height: 720px;
@@ -220,54 +236,132 @@ button {
 
 
 /* ========================================
-   4. 上部エリア
-   左：戻る・得点
-   中央：CPU2
-   右：CPU速度
+   4. 上部メニュー
 ======================================== */
 
 .top-area {
+  position: relative;
+
   display: grid;
 
   grid-template-columns:
-    420px
     minmax(0, 1fr)
-    190px;
+    190px
+    minmax(0, 1fr);
 
   align-items: center;
 
-  gap: 15px;
-
+  gap: 0;
   padding: 8px 20px;
 }
 
+/* 左側 */
+
 .top-left {
+  position: relative;
+
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 
-  align-items: flex-start;
-  justify-content: center;
+  align-items: center;
+  justify-content: flex-start;
 
-  gap: 8px;
-
+  gap: 15px;
   min-width: 0;
 }
 
 .small-button {
   width: 85px;
-
   padding: 10px;
 
   background: #405849;
-  color: white;
+  color: #ffffff;
 
   border: 1px solid #a3b4a1;
   border-radius: 8px;
 }
 
 .top-left #back-button {
+  flex-shrink: 0;
+
   width: 85px;
-  padding: 6px;
+  padding: 8px;
+}
+
+/* 中央CPU */
+
+#cpu-top {
+  position: relative;
+
+  grid-column: 2;
+
+  justify-self: center;
+  align-self: center;
+
+  width: 190px;
+}
+
+/* 右側メニュー */
+
+.top-right {
+  grid-column: 3;
+
+  display: flex;
+  flex-direction: row;
+
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 15px;
+  min-width: 0;
+}
+
+#special-rules-button {
+  width: auto;
+  min-width: 145px;
+
+  margin: 0;
+  padding: 10px 12px;
+
+  font-size: 14px;
+  white-space: nowrap;
+
+  flex-shrink: 0;
+}
+
+/* CPU速度 */
+
+.speed-control {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  margin: 0;
+  flex-shrink: 0;
+
+  font-size: 12px;
+}
+
+.speed-control span {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.speed-control select {
+  width: 95px;
+  padding: 7px;
+
+  background: #405849;
+  color: #ffffff;
+
+  border: 1px solid #91a58f;
+  border-radius: 7px;
+
+  font-size: 13px;
 }
 
 
@@ -280,12 +374,13 @@ button {
 
   display: flex;
 
-  justify-content: flex-start;
   align-items: center;
+  justify-content: flex-start;
 
   gap: 6px;
 
   width: auto;
+  flex-shrink: 0;
 }
 
 #color-counts span {
@@ -294,15 +389,15 @@ button {
   justify-content: center;
   align-items: center;
 
-  min-width: 58px;
+  min-width: 52px;
 
-  padding: 5px 8px;
+  padding: 6px 7px;
 
   border-radius: 7px;
 
-  color: white;
+  color: #ffffff;
 
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
 
   text-align: center;
@@ -310,9 +405,9 @@ button {
 }
 
 #color-counts b {
-  margin-left: 5px;
+  margin-left: 3px;
 
-  font-size: 18px;
+  font-size: 17px;
   font-weight: bold;
 }
 
@@ -334,16 +429,16 @@ button {
 
 
 /* ========================================
-   6. CPUプレイヤーパネル
+   6. プレイヤーパネル
 ======================================== */
 
 .player-panel {
+  padding: 12px;
+
   background: #2c4637;
 
   border: 2px solid #708674;
   border-radius: 12px;
-
-  padding: 12px;
 
   text-align: center;
 }
@@ -370,49 +465,9 @@ button {
   color: #e0e8dd;
 }
 
-/* 上部中央のCPU */
-#cpu-top {
-  justify-self: center;
-  align-self: center;
-
-  width: 190px;
-}
-
 
 /* ========================================
-   7. CPU速度
-======================================== */
-
-.speed-control {
-  display: flex;
-  flex-direction: column;
-
-  align-items: flex-end;
-
-  gap: 6px;
-
-  font-size: 13px;
-}
-
-.top-area .speed-control {
-  justify-self: end;
-}
-
-.speed-control select {
-  width: 110px;
-
-  padding: 7px;
-
-  background: #405849;
-  color: white;
-
-  border: 1px solid #91a58f;
-  border-radius: 7px;
-}
-
-
-/* ========================================
-   8. 中央エリア
+   7. 中央エリア
 ======================================== */
 
 .middle-area {
@@ -452,7 +507,7 @@ button {
 
 
 /* ========================================
-   9. 干支・猫の配置
+   8. 干支・猫の配置
 ======================================== */
 
 #card-field {
@@ -470,7 +525,8 @@ button {
   align-items: start;
 }
 
-/* 干支：6列 × 2段 */
+/* 干支12種類 */
+
 #zodiac-field {
   display: grid;
 
@@ -488,6 +544,7 @@ button {
 }
 
 /* 干支の枠 */
+
 .zodiac-slot {
   position: relative;
 
@@ -508,7 +565,6 @@ button {
   overflow: hidden;
 }
 
-/* 干支名 */
 .slot-label {
   position: absolute;
 
@@ -521,7 +577,8 @@ button {
   z-index: 20;
 }
 
-/* 猫：亥の右側 */
+/* 猫の置き場 */
+
 #cat-cards {
   position: relative;
 
@@ -535,11 +592,10 @@ button {
 
   border: 1px dashed #bca56c;
   border-radius: 8px;
-
-  box-sizing: border-box;
 }
 
 /* 場のカード */
+
 .pile-card {
   position: absolute;
 
@@ -554,7 +610,6 @@ button {
   box-shadow: 0 2px 5px #0007;
 }
 
-/* 干支と猫のカードサイズを統一 */
 #zodiac-field .pile-card,
 #cat-cards .pile-card {
   position: absolute;
@@ -565,9 +620,17 @@ button {
   height: 104px;
 }
 
+/* 特殊効果の対象強調 */
+
+.zodiac-slot.special-highlight {
+  outline: 3px solid #ffe28b;
+  box-shadow: 0 0 20px #ffe28b;
+  border-radius: 10px;
+}
+
 
 /* ========================================
-   10. フィールド下部メッセージ
+   9. ゲームアナウンス
 ======================================== */
 
 .field-footer {
@@ -582,13 +645,22 @@ button {
 }
 
 #game-message {
-  color: #e6dfb7;
-  font-size: 15px;
+  color: #ffe08a;
+
+  font-size: 23px;
+  font-weight: bold;
+
+  text-align: center;
+  line-height: 1.3;
+
+  text-shadow:
+    1px 1px 3px rgba(0, 0, 0, 0.9),
+    0 0 8px rgba(255, 200, 70, 0.35);
 }
 
 
 /* ========================================
-   11. 下部手札エリア
+   10. 下部手札エリア
 ======================================== */
 
 .bottom-area {
@@ -611,6 +683,12 @@ button {
 }
 
 #my-info {
+  display: flex;
+
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+
   font-size: 17px;
   font-weight: bold;
 }
@@ -624,7 +702,7 @@ button {
   padding: 6px 16px;
 
   background: #385342;
-  color: white;
+  color: #ffffff;
 
   border: 1px solid #829780;
   border-radius: 7px;
@@ -632,7 +710,7 @@ button {
 
 .sort-button.active {
   background: #c9a968;
-  color: #222;
+  color: #222222;
 }
 
 .hand-main {
@@ -661,6 +739,47 @@ button {
 
 
 /* ========================================
+   11. プレイヤー担当色
+======================================== */
+
+.my-color-badge {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 40px;
+  padding: 4px 10px;
+
+  border-radius: 6px;
+
+  font-size: 17px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.my-color-badge.red {
+  background: #d94747;
+  color: #ffffff;
+}
+
+.my-color-badge.blue {
+  background: #347bd1;
+  color: #ffffff;
+}
+
+.my-color-badge.yellow {
+  background: #f2cf45;
+  color: #29220c;
+}
+
+.my-color-badge.green {
+  background: #3ca66b;
+  color: #ffffff;
+}
+
+
+/* ========================================
    12. 手札カード
 ======================================== */
 
@@ -684,6 +803,13 @@ button {
     box-shadow 0.15s;
 
   cursor: pointer;
+
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hand-card img {
+  pointer-events: none;
 }
 
 .hand-card.selected {
@@ -692,6 +818,30 @@ button {
   outline: 2px solid #f7d86d;
 
   box-shadow: 0 0 12px #f4d56d;
+}
+
+/* 新しく受け取ったカード */
+
+.hand-card.new-hand-card {
+  animation:
+    newCardBlink 0.6s ease-in-out infinite;
+
+  border-radius: 6px;
+}
+
+@keyframes newCardBlink {
+  0%,
+  100% {
+    outline: 4px solid #ffd700;
+    outline-offset: -4px;
+    filter: brightness(1);
+  }
+
+  50% {
+    outline: 4px solid #fff6a0;
+    outline-offset: -4px;
+    filter: brightness(1.3);
+  }
 }
 
 
@@ -733,7 +883,6 @@ button {
 
 /* ========================================
    14. 仮カード
-   画像がない場合の表示
 ======================================== */
 
 .card-placeholder {
@@ -743,7 +892,7 @@ button {
   justify-content: center;
   align-items: center;
 
-  color: white;
+  color: #ffffff;
 
   font-weight: bold;
   user-select: none;
@@ -887,58 +1036,98 @@ button {
 
 
 /* ========================================
-   17. ゲーム終了画面
+   17. 特殊効果メッセージ
 ======================================== */
 
-#result-overlay {
+/* =====================================
+   特殊効果メッセージ
+===================================== */
+
+.special-effect-message {
   position: fixed;
-  inset: 0;
 
-  z-index: 10000;
+  left: 50%;
+  top: 50%;
 
-  display: flex;
+  transform: translate(-50%, -50%);
 
-  justify-content: center;
-  align-items: center;
+  z-index: 15000;
 
-  background: #000b;
-}
+  width: 620px;
+  max-width: 90vw;
 
-.result-panel {
-  width: min(90vw, 460px);
+  padding: 20px 28px;
 
-  max-height: 85vh;
-  overflow: auto;
+  background: rgba(25, 40, 32, 0.96);
 
-  padding: 25px;
+  border: 2px solid #f0d37c;
+  border-radius: 12px;
 
-  border: 2px solid #d5b36c;
-  border-radius: 15px;
-
-  background: #243b30;
-  color: white;
+  color: #fff1bd;
 
   text-align: center;
-}
 
-.result-panel h2 {
-  color: #f1d78f;
-  font-size: 28px;
-}
-
-.result-row {
-  display: flex;
-
-  justify-content: space-between;
-
-  padding: 10px;
-
-  border-bottom: 1px solid #6b806e;
-}
-
-.result-row.winner {
-  background: #816a3270;
+  font-size: 23px;
   font-weight: bold;
+  line-height: 1.6;
+
+  /* \n による改行を反映 */
+  white-space: pre-line;
+
+  overflow-wrap: anywhere;
+
+  box-shadow: 0 0 25px #000a;
+
+  pointer-events: none;
+}
+
+.special-effect-message.show {
+  animation: specialEffectAppear 0.25s ease-out;
+}
+
+@keyframes specialEffectAppear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -65%) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* =====================================
+   スマホ縦持ち
+===================================== */
+
+@media (orientation: portrait) {
+
+  .special-effect-message {
+    left: 50%;
+    top: 50%;
+
+    width: 620px;
+    max-width: calc(100dvh - 40px);
+
+    padding: 15px 20px;
+
+    font-size: 22px;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(90deg);
+
+    transform-origin: center center;
+  }
+
+  .special-effect-message.show {
+    animation: none !important;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(90deg) !important;
+  }
 }
 
 
@@ -957,24 +1146,23 @@ button {
   align-items: center;
   justify-content: center;
 
-  padding: 12px;
+  padding: 8px;
 
-  overflow: auto;
+  overflow: hidden;
 
   background: #000c;
 }
 
-#reveal-overlay.hidden {
-  display: none !important;
-}
-
 .reveal-panel {
-  width: min(90vw, 850px);
+  display: flex;
+  flex-direction: column;
 
-  max-height: 85vh;
-  overflow: auto;
+  width: min(94vw, 850px);
+  max-height: calc(100dvh - 16px);
 
-  padding: 24px;
+  padding: 12px 18px;
+
+  overflow: hidden;
 
   background: #263f32;
 
@@ -982,29 +1170,45 @@ button {
   border-radius: 14px;
 
   text-align: center;
-  color: white;
+  color: #ffffff;
 }
 
 .reveal-panel h2 {
-  margin: 0 0 12px;
+  flex-shrink: 0;
+
+  margin: 0 0 5px;
 
   color: #f1d58b;
+  font-size: 21px;
+}
+
+#reveal-description {
+  flex-shrink: 0;
+
+  margin: 3px 0 8px;
+
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 #reveal-cards {
   display: flex;
 
+  flex: 1;
   flex-wrap: wrap;
   justify-content: center;
 
+  min-height: 0;
+
   gap: 8px;
 
-  max-height: 48vh;
-
-  margin: 20px 0;
+  margin: 5px 0 10px;
 
   overflow-y: auto;
+  overflow-x: hidden;
+
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .reveal-card {
@@ -1023,317 +1227,6 @@ button {
 }
 
 .reveal-panel .main-button {
-  max-width: 250px;
-}
-
-
-/* ========================================
-   19. 猫の公開画面
-======================================== */
-
-#reveal-cards:has(.cat-reveal-group) {
-  display: flex;
-
-  flex-direction: column;
-  align-items: stretch;
-
-  gap: 14px;
-}
-
-.cat-reveal-group {
-  padding: 12px;
-
-  border: 1px solid #bba36b;
-  border-radius: 9px;
-
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.cat-reveal-title {
-  margin-bottom: 10px;
-
-  color: #f4dc98;
-
-  font-size: 17px;
-  font-weight: bold;
-}
-
-.cat-reveal-card-list {
-  display: flex;
-
-  flex-wrap: wrap;
-  justify-content: center;
-
-  gap: 7px;
-}
-
-
-/* ========================================
-   20. 特殊効果メッセージ
-======================================== */
-
-.special-effect-message {
-  position: fixed;
-
-  left: 50%;
-  top: 35%;
-
-  transform: translate(-50%, -50%);
-
-  z-index: 15000;
-
-  min-width: 300px;
-  max-width: 80vw;
-
-  padding: 18px 28px;
-
-  background: rgba(25, 40, 32, 0.95);
-
-  border: 2px solid #f0d37c;
-  border-radius: 12px;
-
-  color: #fff1bd;
-
-  text-align: center;
-
-  font-size: 23px;
-  font-weight: bold;
-
-  box-shadow: 0 0 25px #000a;
-
-  pointer-events: none;
-}
-
-.special-effect-message.show {
-  animation:
-    specialEffectAppear 0.25s ease-out;
-}
-
-@keyframes specialEffectAppear {
-
-  from {
-    opacity: 0;
-
-    transform:
-      translate(-50%, -65%) scale(0.9);
-  }
-
-  to {
-    opacity: 1;
-
-    transform:
-      translate(-50%, -50%) scale(1);
-  }
-}
-
-
-/* ========================================
-   21. 干支の山の強調表示
-======================================== */
-
-.zodiac-slot.special-highlight {
-  outline: 3px solid #ffe28b;
-
-  box-shadow: 0 0 20px #ffe28b;
-
-  border-radius: 10px;
-}
-
-
-/* ========================================
-   22. スマホ横向き時の公開画面
-======================================== */
-
-@media (max-height: 500px) {
-
-  #reveal-overlay {
-    padding: 8px;
-  }
-
-  #reveal-cards {
-    max-height: 35vh;
-  }
-
-  .cat-reveal-group {
-    padding: 7px;
-  }
-
-  .cat-reveal-title {
-    font-size: 13px;
-    margin-bottom: 5px;
-  }
-
-}
-
-
-/* ========================================
-   上部配置の最終調整
-======================================== */
-
-/* 上部全体 */
-.top-area {
-  position: relative;
-
-  display: grid;
-
-  grid-template-columns:
-    1fr 190px 1fr;
-
-  align-items: center;
-
-  gap: 0;
-
-  padding: 8px 20px;
-}
-
-/* 左側の戻る・得点表示 */
-.top-left {
-  position: relative;
-
-  display: flex;
-  flex-direction: row;
-
-  align-items: center;
-  justify-content: flex-start;
-
-  gap: 15px;
-
-  min-width: 0;
-}
-
-/* 戻るボタン */
-.top-left #back-button {
-  flex-shrink: 0;
-
-  width: 85px;
-  padding: 8px;
-}
-
-/* 得点表示 */
-#color-counts {
-  position: static;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: flex-start;
-
-  gap: 6px;
-
-  width: auto;
-  flex-shrink: 0;
-}
-
-#color-counts span {
-  min-width: 52px;
-
-  padding: 6px 7px;
-
-  font-size: 14px;
-}
-
-#color-counts b {
-  margin-left: 3px;
-  font-size: 17px;
-}
-
-/* CPU2をゲーム画面中央に */
-#cpu-top {
-  position: relative;
-
-  grid-column: 2;
-
-  justify-self: center;
-  align-self: center;
-
-  width: 190px;
-}
-
-/* CPU速度を右端に */
-.top-area .speed-control {
-  grid-column: 3;
-
-  justify-self: end;
-  align-self: center;
-}
-
-/* ========================================
-   猫の公開画面 コンパクト化
-======================================== */
-
-/* 公開画面全体 */
-#reveal-overlay {
-  padding: 8px;
-  overflow: hidden;
-}
-
-/* 公開パネル */
-.reveal-panel {
-  display: flex;
-  flex-direction: column;
-
-  width: min(94vw, 850px);
-  max-height: calc(100dvh - 16px);
-
-  padding: 12px 18px;
-
-  overflow: hidden;
-}
-
-/* タイトル */
-.reveal-panel h2 {
-  flex-shrink: 0;
-
-  margin: 0 0 5px;
-
-  font-size: 21px;
-}
-
-/* 説明文 */
-#reveal-description {
-  flex-shrink: 0;
-
-  margin: 3px 0 8px;
-
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-/* カード表示領域 */
-#reveal-cards {
-  flex: 1;
-  min-height: 0;
-
-  max-height: none;
-
-  margin: 5px 0 10px;
-
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  overscroll-behavior: contain;
-}
-
-/* 猫のプレイヤー別グループ */
-.cat-reveal-group {
-  padding: 6px 8px;
-}
-
-/* 誰から誰へ渡すか */
-.cat-reveal-title {
-  margin-bottom: 5px;
-
-  font-size: 13px;
-}
-
-/* 子カードを小さくする */
-.cat-reveal-card-list .reveal-card {
-  width: 52px;
-  height: 73px;
-}
-
-/* 確認ボタンを下に固定 */
-.reveal-panel .main-button {
   flex-shrink: 0;
 
   align-self: center;
@@ -1346,535 +1239,10 @@ button {
   font-size: 15px;
 }
 
-
-/* プレイヤーの担当色 */
-
-#my-info {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-
-.my-color-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 40px;
-  padding: 4px 10px;
-
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 17px;
-  color: white;
-}
-
-.my-color-badge.red {
-  background: #bd4040;
-}
-
-.my-color-badge.blue {
-  background: #346da8;
-}
-
-.my-color-badge.yellow {
-  background: #e0b52e;
-  color: #222;
-}
-
-.my-color-badge.green {
-  background: #32845b;
-}
-
-
-/* =====================================
-   特殊カード説明ボタン
-===================================== */
-
-#special-rules-button {
-  justify-self: end;
-  align-self: center;
-
-  padding: 9px 15px;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-
-/* =====================================
-   特殊カード説明画面
-===================================== */
-
-#special-rules-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(0, 0, 0, 0.78);
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-#special-rules-overlay.hidden {
-  display: none;
-}
-
-
-/* 説明パネル */
-
-.special-rules-panel {
-  width: min(1100px, 96vw);
-  max-height: calc(100dvh - 24px);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  padding: 18px 22px;
-  box-sizing: border-box;
-
-  background: #f7f0dc;
-  color: #302719;
-
-  border: 3px solid #b79a63;
-  border-radius: 14px;
-
-  overflow: hidden;
-}
-
-.special-rules-panel h2 {
-  margin: 0 0 15px;
-  font-size: 25px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-
-/* 5枚を横並び */
-
-.special-rules-list {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-
-  gap: 12px;
-  width: 100%;
-
-  min-height: 0;
-  overflow-y: auto;
-}
-
-
-/* カードごとの説明 */
-
-.special-rule-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  padding: 10px;
-  box-sizing: border-box;
-
-  background: #fffaf0;
-  border: 1px solid #d5c5a2;
-  border-radius: 10px;
-}
-
-.special-rule-item img {
-  display: block;
-  width: 100%;
-  max-width: 125px;
-  height: auto;
-
-  border-radius: 5px;
-  object-fit: contain;
-}
-
-.special-rule-item h3 {
-  margin: 10px 0 7px;
-  font-size: 20px;
-  text-align: center;
-}
-
-.special-rule-item p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.6;
-  text-align: left;
-}
-
-
-/* 閉じるボタン */
-
-#special-rules-close {
-  flex-shrink: 0;
-
-  margin-top: 16px;
-  width: 220px;
-
-  padding: 10px 18px;
-  font-size: 17px;
-}
-
-
-/* =====================================
-   画面が狭い場合
-===================================== */
-
-@media (max-width: 800px) {
-
-  .special-rules-panel {
-    padding: 12px;
-  }
-
-  .special-rules-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .special-rule-item img {
-    max-width: 90px;
-  }
-
-  .special-rule-item h3 {
-    font-size: 16px;
-  }
-
-  .special-rule-item p {
-    font-size: 12px;
-  }
-
-}
-
-/* =====================================
-   上部メニューの配置修正
-===================================== */
-
-.top-area {
-  grid-template-columns: 1fr 190px 1fr;
-}
-
-/* 特殊カード説明ボタン */
-#special-rules-button {
-  grid-column: 3;
-  grid-row: 1;
-
-  justify-self: end;
-  align-self: start;
-
-  margin-right: 105px;
-  margin-top: 12px;
-
-  padding: 7px 10px;
-  font-size: 12px;
-
-  white-space: nowrap;
-}
-
-/* CPU速度 */
-.speed-control {
-  grid-column: 3;
-  grid-row: 1;
-
-  justify-self: end;
-  align-self: start;
-
-  margin-top: 12px;
-  margin-right: 10px;
-}
-
-/* =====================================
-   右上メニューの最終調整
-===================================== */
-
-.top-area {
-  grid-template-columns: 1fr 190px 1fr;
-}
-
-/* 特殊カード説明ボタン */
-#special-rules-button {
-  grid-column: 3;
-  grid-row: 1;
-
-  justify-self: end;
-  align-self: center;
-
-  margin: 0 105px 0 0;
-
-  padding: 9px 12px;
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-/* CPU速度 */
-.speed-control {
-  grid-column: 3;
-  grid-row: 1;
-
-  justify-self: end;
-  align-self: center;
-
-  margin: 0 10px 0 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.speed-control span {
-  font-size: 11px;
-}
-
-.speed-control select {
-  width: 80px;
-  font-size: 12px;
-}
-
-
-
-/* =====================================
-   上部メニュー配置
-===================================== */
-
-.top-area {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    190px
-    minmax(0, 1fr);
-
-  align-items: center;
-
-  gap: 0;
-  padding: 8px 20px;
-}
-
-/* 左側 */
-.top-left {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  gap: 15px;
-  min-width: 0;
-}
-
-/* 中央 CPU2 */
-#cpu-top {
-  grid-column: 2;
-
-  width: 190px;
-
-  justify-self: center;
-  align-self: center;
-}
-
-/* 右側のメニュー全体 */
-.top-right {
-  grid-column: 3;
-
-  display: flex;
-  flex-direction: row;
-
-  align-items: center;
-  justify-content: flex-end;
-
-  gap: 15px;
-  min-width: 0;
-}
-
-/* 特殊カード説明 */
-#special-rules-button {
-  width: auto;
-  min-width: 145px;
-
-  margin: 0;
-  padding: 10px 12px;
-
-  font-size: 14px;
-  white-space: nowrap;
-
-  flex-shrink: 0;
-}
-
-/* CPU速度 */
-.top-right .speed-control {
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  gap: 5px;
-
-  margin: 0;
-  flex-shrink: 0;
-}
-
-.top-right .speed-control span {
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.top-right .speed-control select {
-  width: 95px;
-  padding: 7px;
-
-  font-size: 13px;
-}
-
-
-/* =====================================
-   新しく受け取ったカードの強調表示
-===================================== */
-
-.hand-card.new-hand-card {
-  animation: newCardBlink 0.6s ease-in-out infinite;
-  border-radius: 6px;
-}
-
-@keyframes newCardBlink {
-
-  0%, 100% {
-    outline: 4px solid #ffd700;
-    outline-offset: -4px;
-    filter: brightness(1);
-  }
-
-  50% {
-    outline: 4px solid #fff6a0;
-    outline-offset: -4px;
-    filter: brightness(1.3);
-  }
-
-}
-
-/* =====================================
-   手札公開画面の横向き表示
-   スマホ縦持ち時に90度回転
-===================================== */
+/* スマホ縦持ち時は横長表示 */
 
 @media (orientation: portrait) {
-
   #reveal-overlay {
-
-    position: fixed;
-
-    top: 50%;
-    left: 50%;
-
-    width: 100dvh;
-    height: 100dvw;
-
-    transform: translate(-50%, -50%) rotate(90deg);
-
-    transform-origin: center center;
-
-    box-sizing: border-box;
-
-  }
-
-  #reveal-overlay .reveal-panel {
-
-    width: min(94%, 850px);
-
-    max-height: calc(100dvw - 16px);
-
-  }
-
-}
-
-
-/* =====================================
-   トップ画面のルール説明
-===================================== */
-
-#rules-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  padding: 12px;
-  box-sizing: border-box;
-
-  background: rgba(0, 0, 0, 0.85);
-}
-
-#rules-overlay.hidden {
-  display: none;
-}
-
-.rules-panel {
-  display: flex;
-  flex-direction: column;
-
-  width: min(92vw, 850px);
-  max-height: calc(100dvh - 24px);
-
-  padding: 22px;
-  box-sizing: border-box;
-
-  background: #f5edd8;
-  color: #29251d;
-
-  border: 3px solid #aa8545;
-  border-radius: 12px;
-}
-
-.rules-panel h2 {
-  margin: 0 0 15px;
-  text-align: center;
-  font-size: 25px;
-}
-
-.rules-content {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 0 12px;
-}
-
-.rules-content section {
-  margin-bottom: 20px;
-}
-
-.rules-content h3 {
-  margin: 0 0 8px;
-  padding-bottom: 5px;
-
-  border-bottom: 1px solid #bfa77b;
-  font-size: 19px;
-}
-
-.rules-content p {
-  margin: 6px 0;
-  font-size: 15px;
-  line-height: 1.7;
-}
-
-#rules-close {
-  flex-shrink: 0;
-  align-self: center;
-
-  width: 200px;
-  margin-top: 14px;
-}
-
-/* スマホ縦持ちでもルール画面を横向きにする */
-
-@media (orientation: portrait) {
-
-  #rules-overlay {
     top: 50%;
     left: 50%;
     right: auto;
@@ -1886,81 +1254,268 @@ button {
     transform:
       translate(-50%, -50%)
       rotate(90deg);
+
+    transform-origin: center center;
   }
 
-  .rules-panel {
+  #reveal-overlay .reveal-panel {
     width: min(94%, 850px);
-    max-height: calc(100dvw - 24px);
-    padding: 12px 18px;
+    max-height: calc(100dvw - 16px);
   }
-
-  .rules-panel h2 {
-    font-size: 21px;
-    margin-bottom: 8px;
-  }
-
-  .rules-content h3 {
-    font-size: 16px;
-  }
-
-  .rules-content p {
-    font-size: 13px;
-  }
-
 }
 
-/* =====================================
-   トップ画面のボタン間隔調整
-===================================== */
+/* 高さが低い画面 */
 
-#rules-button {
+@media (max-height: 500px) {
+  #reveal-cards {
+    max-height: 35vh;
+  }
+}
+
+
+/* ========================================
+   19. 猫の公開画面
+======================================== */
+
+/* 4人分を横一列に表示 */
+
+#reveal-cards:has(.cat-reveal-group) {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 8px;
+
+  width: 100%;
+  min-width: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  padding: 8px 0;
+}
+
+.cat-reveal-group {
+  width: 100%;
+  min-width: 0;
+
+  padding: 8px 4px;
+
+  border: 1px solid #bba36b;
+  border-radius: 9px;
+
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.cat-reveal-title {
+  margin-bottom: 6px;
+
+  color: #f4dc98;
+
+  font-size: 11px;
+  font-weight: bold;
+
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cat-reveal-card-list {
+  display: flex;
+
+  flex-wrap: wrap;
+  justify-content: center;
+
+  gap: 4px;
+}
+
+.cat-reveal-card-list .reveal-card {
+  width: 48px;
+  height: 68px;
+
+  flex-shrink: 0;
+}
+
+/* 確認ボタン */
+
+#reveal-overlay .reveal-panel > .main-button {
+  flex-shrink: 0;
+}
+
+
+/* ========================================
+   20. リザルト画面
+======================================== */
+
+#result-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 10000;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px;
+
+  background: rgba(0, 0, 0, 0.72);
+}
+
+#result-overlay .result-panel {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  width: min(90vw, 230px);
+  max-height: calc(100dvh - 12px);
+
+  padding: 18px 12px;
+
+  overflow: hidden;
+
+  border: 2px solid #d5b36c;
+  border-radius: 14px;
+
+  background: #243b30;
+  color: #ffffff;
+
+  text-align: center;
+}
+
+/* タイトル */
+
+#result-overlay .result-panel h2 {
+  margin: 0 0 8px;
+
+  color: #f1d78f;
+
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+/* 勝者表示 */
+
+#result-overlay .result-panel h3 {
+  margin: 0 0 16px;
+
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+/* 得点一覧 */
+
+#result-overlay .result-row {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  width: 100%;
+  min-height: 30px;
+
+  gap: 6px;
+
+  padding: 6px 4px;
+
+  border-bottom: 1px solid #63786c;
+
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+#result-overlay .result-row.winner {
+  background: rgba(213, 179, 108, 0.24);
+  font-weight: bold;
+}
+
+#result-overlay .result-row span:first-child {
+  flex: 1;
+  min-width: 0;
+
+  text-align: left;
+  white-space: nowrap;
+}
+
+#result-overlay .result-row span:last-child {
+  width: 30px;
+  flex-shrink: 0;
+
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* 3つの操作ボタン */
+
+#result-overlay .result-panel .main-button {
   display: block;
-  width: 260px;
-  max-width: 100%;
-  margin: 20px auto 0;
+
+  width: 100%;
+  min-height: 36px;
+
+  margin: 10px 0 0 !important;
+  padding: 7px 6px;
+
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+#result-overlay .result-panel .main-button:last-child {
+  background: #52685a;
+  color: #ffffff;
+
+  border: 1px solid #8da393;
+}
+
+/* 高さが低いスマホ横画面 */
+
+@media (max-height: 380px) {
+  #result-overlay .result-panel {
+    padding: 10px 12px;
+  }
+
+  #result-overlay .result-panel h2 {
+    margin-bottom: 4px;
+    font-size: 18px;
+  }
+
+  #result-overlay .result-panel h3 {
+    margin-bottom: 7px;
+    font-size: 12px;
+  }
+
+  #result-overlay .result-row {
+    min-height: 23px;
+
+    padding: 3px 4px;
+
+    font-size: 11px;
+  }
+
+  #result-overlay .result-panel .main-button {
+    min-height: 29px;
+
+    margin-top: 5px !important;
+    padding: 4px 6px;
+
+    font-size: 11px;
+  }
 }
 
 
-/* =====================================
-   iPhone ホーム画面
-   タッチ操作の安定化
-===================================== */
-
-button,
-select,
-.hand-card {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* カード画像がタッチ対象を妨げないようにする */
-.hand-card img {
-  pointer-events: none;
-}
-
-/* ボタン内の文字を選択させない */
-button {
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* =====================================
-   終了盤面確認モード
-===================================== */
-
-/* =====================================
-   リザルトに戻るボタン
-   酉のカードの下付近
-===================================== */
+/* ========================================
+   21. 終了盤面確認モード
+======================================== */
 
 #return-result-button {
-
   position: absolute;
 
-  /* 盤面の左からの位置 */
   left: 50%;
-
-  /* 盤面の上からの位置 */
   top: 70%;
 
   transform: translate(-50%, -50%);
@@ -1979,577 +1534,291 @@ button {
   font-weight: bold;
 
   white-space: nowrap;
-
   cursor: pointer;
-  touch-action: manipulation;
 }
 
 
-/* リザルトのボタン間隔 */
-.result-panel .main-button {
+/* ========================================
+   22. 特殊カード説明画面
+   5枚縦並び・横長表示
+======================================== */
 
-  display: block;
-
-  width: 100%;
-
-  touch-action: manipulation;
-
-}
-
-
-
-/* =====================================
-   リザルト画面 縦長コンパクト版
-===================================== */
-
-#result-overlay {
+#special-rules-overlay {
   position: fixed;
   inset: 0;
+
   z-index: 10000;
 
   display: flex;
+
+  align-items: center;
   justify-content: center;
-  align-items: center;
 
-  padding: 8px;
-  box-sizing: border-box;
-
-  background: rgba(0, 0, 0, 0.72);
-}
-
-/* リザルト本体 */
-#result-overlay .result-panel {
-
-  width: min(90vw, 340px);
-
-  max-height: calc(100dvh - 16px);
-
-  padding: 17px 20px 18px;
-
-  box-sizing: border-box;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 0;
 
   overflow: hidden;
 
-  border: 2px solid #d5b36c;
-  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.78);
+}
 
-  background: #243b30;
-  color: #ffffff;
+/* 説明パネル */
+
+#special-rules-overlay .special-rules-panel {
+  display: flex;
+  flex-direction: column;
+
+  align-items: stretch;
+
+  width: min(900px, 96vw);
+  height: min(640px, 96dvh);
+
+  max-width: none;
+  max-height: none;
+
+  gap: 6px;
+
+  padding: 10px 16px;
+
+  overflow: hidden;
+
+  background: #f7f0dc;
+  color: #302719;
+
+  border: 3px solid #b79a63;
+  border-radius: 14px;
+}
+
+/* タイトル */
+
+#special-rules-overlay .special-rules-panel h2 {
+  flex: 0 0 auto;
+
+  margin: 0;
+
+  font-size: 20px;
+  line-height: 1.2;
 
   text-align: center;
 }
 
-/* タイトル */
-#result-overlay .result-panel h2 {
+/* 5枚を縦に並べる */
 
-  margin: 0 0 6px;
+#special-rules-overlay .special-rules-list {
+  display: grid;
 
-  font-size: 21px;
-  line-height: 1.2;
+  grid-template-columns:
+    minmax(0, 1fr);
 
-  color: #f1d78f;
-}
+  grid-template-rows:
+    repeat(5, minmax(0, 1fr));
 
-/* 勝者 */
-#result-overlay .result-panel h3 {
-
-  margin: 0 0 14px;
-
-  font-size: 18px;
-  line-height: 1.3;
-}
-
-/* 得点一覧 */
-#result-overlay .result-row {
+  flex: 1 1 auto;
 
   width: 100%;
+  min-height: 0;
 
-  min-height: 28px;
+  gap: 5px;
 
+  overflow: hidden;
+}
+
+/* 各カードの説明 */
+
+#special-rules-overlay .special-rule-item {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+
   align-items: center;
+  justify-content: flex-start;
 
-  gap: 15px;
-
-  padding: 15px 10px;
-
-  box-sizing: border-box;
-
-  border-bottom: 1px solid #63786c;
-
-  font-size: 15px;
-  line-height: 1.3;
-}
-
-/* 勝者の行 */
-#result-overlay .result-row.winner {
-
-  background: rgba(213, 179, 108, 0.24);
-
-  font-weight: bold;
-}
-
-/* プレイヤー名 */
-#result-overlay .result-row span:first-child {
-
-  flex: 1;
-  width: auto;
   min-width: 0;
+  min-height: 0;
 
-  text-align: left;
+  gap: 14px;
+  padding: 3px 8px;
+
+  overflow: hidden;
+
+  background: #fffaf0;
+
+  border: 1px solid #d5c5a2;
+  border-radius: 10px;
 }
 
-/* 得点 */
-#result-overlay .result-row span:last-child {
+/* カード画像 */
 
-  width: 42px;
-  flex-shrink: 0;
-
-  text-align: right;
-  white-space: nowrap;
-}
-
-/* ボタン */
-#result-overlay .result-panel .main-button {
-
+#special-rules-overlay .special-rule-item img {
   display: block;
 
-  width: 100%;
-  min-height: 36px;
+  flex: 0 0 auto;
 
-  padding: 7px 12px;
+  width: auto;
+  height: 100%;
 
-  margin: 10px 0 0 !important;
+  max-width: none;
+  max-height: 100%;
 
-  box-sizing: border-box;
+  border-radius: 5px;
 
-  border-radius: 9px;
-
-  font-size: 13px;
-  font-weight: bold;
-  line-height: 1.2;
-
-  touch-action: manipulation;
+  object-fit: contain;
 }
 
-/* 画面の高さが低い場合 */
-@media (max-height: 380px) {
+/* 説明領域 */
 
-  #result-overlay .result-panel {
-
-    padding: 10px 16px 12px;
-  }
-
-  #result-overlay .result-panel h2 {
-
-    margin-bottom: 3px;
-    font-size: 19px;
-  }
-
-  #result-overlay .result-panel h3 {
-
-    margin-bottom: 7px;
-    font-size: 14px;
-  }
-
-  #result-overlay .result-row {
-
-    min-height: 23px;
-    padding: 3px 8px;
-    font-size: 12px;
-  }
-
-  #result-overlay .result-panel .main-button {
-
-    min-height: 10px;
-    padding: 5px 10px;
-
-    margin-top: 6px !important;
-
-    font-size: 18px;
-  }
-}
-
-/* 非表示を確実に適用 */
-#result-overlay.hidden,
-#return-result-button.hidden {
-  display: none !important;
-}
-
-/* =====================================
-   リザルト画面 3ボタン対応
-===================================== */
-
-#result-overlay .result-panel {
-  width: min(90vw, 340px);
-  max-height: calc(100dvh - 12px);
-  padding: 12px 18px;
-}
-
-/* ボタン共通 */
-#result-overlay .result-panel .main-button {
-  width: 100%;
-  min-height: 32px;
-
-  margin: 7px 0 0 !important;
-  padding: 6px 10px;
-
-  font-size: 13px;
-  line-height: 1.2;
-
-  box-sizing: border-box;
-}
-
-/* 最後のホームボタンだけ少し落ち着いた色 */
-#result-overlay .result-panel .main-button:last-child {
-  background: #52685a;
-  color: #ffffff;
-  border: 1px solid #8da393;
-}
-
-/* 高さが低い画面 */
-@media (max-height: 380px) {
-
-  #result-overlay .result-panel {
-    padding: 8px 14px;
-  }
-
-  #result-overlay .result-panel h3 {
-    margin-bottom: 5px;
-  }
-
-  #result-overlay .result-row {
-    min-height: 21px;
-    padding: 2px 8px;
-  }
-
-  #result-overlay .result-panel .main-button {
-    min-height: 28px;
-    margin-top: 5px !important;
-    padding: 4px 8px;
-    font-size: 12px;
-  }
-
-}
-
-/* =====================================
-   リザルト画面 細長いレイアウト
-===================================== */
-
-/* リザルト全体 */
-#result-overlay .result-panel {
-
-  width: min(90vw, 230px);
-
-  max-height: calc(100dvh - 12px);
-
-  padding: 18px 12px;
-
-  box-sizing: border-box;
-
-}
-
-/* タイトル */
-#result-overlay .result-panel h2 {
-
-  font-size: 20px;
-  margin-bottom: 8px;
-
-}
-
-/* 勝者表示 */
-#result-overlay .result-panel h3 {
-
-  font-size: 13px;
-  margin-bottom: 16px;
-
-}
-
-/* プレイヤー得点 */
-#result-overlay .result-row {
-
-  width: 100%;
-
-  min-height: 30px;
-
-  padding: 6px 4px;
-
-  gap: 6px;
-
-  font-size: 12px;
-
-}
-
-/* 名前 */
-#result-overlay .result-row span:first-child {
-
-  flex: 1;
+#special-rules-overlay .special-rule-item > div {
+  flex: 1 1 auto;
   min-width: 0;
+}
+
+/* カード名 */
+
+#special-rules-overlay .special-rule-item h3 {
+  margin: 0 0 3px;
+
+  font-size: 16px;
+  line-height: 1.2;
 
   text-align: left;
-  white-space: nowrap;
-
 }
 
-/* 得点 */
-#result-overlay .result-row span:last-child {
+/* 説明文 */
 
-  width: 30px;
+#special-rules-overlay .special-rule-item p {
+  margin: 0;
 
-  text-align: right;
-  white-space: nowrap;
+  font-size: 13px;
+  line-height: 1.3;
 
+  text-align: left;
 }
 
-/* 3つのボタン */
-#result-overlay .result-panel .main-button {
+/* 閉じるボタン */
 
-  width: 100%;
+#special-rules-overlay #special-rules-close {
+  flex: 0 0 auto;
 
-  min-height: 36px;
+  align-self: center;
 
-  margin-top: 10px !important;
+  width: 120px;
+  height: 30px;
+  min-height: 30px;
 
-  padding: 7px 6px;
+  margin: 0;
+  padding: 3px 12px;
 
-  font-size: 12px;
-
-  border-radius: 8px;
-
+  font-size: 13px;
+  line-height: 1.2;
 }
 
-/* 高さが低いスマホ横画面 */
-@media (max-height: 380px) {
-
-  #result-overlay .result-panel {
-    padding: 10px 12px;
-  }
-
-  #result-overlay .result-panel h2 {
-    margin-bottom: 4px;
-    font-size: 18px;
-  }
-
-  #result-overlay .result-panel h3 {
-    margin-bottom: 7px;
-    font-size: 12px;
-  }
-
-  #result-overlay .result-row {
-    min-height: 23px;
-    padding: 3px 4px;
-    font-size: 11px;
-  }
-
-  #result-overlay .result-panel .main-button {
-    min-height: 29px;
-    margin-top: 5px !important;
-    padding: 4px 6px;
-    font-size: 11px;
-  }
-
-}
-
-/* =====================================
-   猫の効果メッセージ
-   スマホ縦持ち時は90度回転
-===================================== */
+/* スマホ縦持ち時 */
 
 @media (orientation: portrait) {
-
-  .special-effect-message {
-
-    position: fixed;
+  #special-rules-overlay .special-rules-panel {
+    position: absolute;
 
     left: 50%;
     top: 50%;
+
+    width: 96dvh;
+    height: 96dvw;
+
+    max-width: none;
+    max-height: none;
 
     transform:
       translate(-50%, -50%)
       rotate(90deg);
 
-    transform-origin: center center;
-
-    min-width: 0;
-    width: max-content;
-    max-width: calc(100dvh - 40px);
-
-    padding: 12px 20px;
-
-    box-sizing: border-box;
-
-    text-align: center;
-
+    transform-origin: center;
   }
-
 }
 
-/* =====================================
-   猫の効果メッセージ
-   縦画面で回転前の表示を防止
-===================================== */
+/* スマホ横持ち時 */
 
-@media (orientation: portrait) {
+@media (orientation: landscape) and (max-height: 600px) {
+  #special-rules-overlay .special-rules-panel {
+    width: 96vw;
+    height: 96dvh;
 
-  .special-effect-message.show {
-
-    animation: none !important;
-
-    transform:
-      translate(-50%, -50%)
-      rotate(90deg) !important;
-
+    padding: 6px 12px;
   }
 
+  #special-rules-overlay .special-rules-panel h2 {
+    font-size: 16px;
+  }
+
+  #special-rules-overlay .special-rule-item {
+    padding: 2px 6px;
+    gap: 10px;
+  }
+
+  #special-rules-overlay .special-rule-item h3 {
+    margin-bottom: 2px;
+    font-size: 13px;
+  }
+
+  #special-rules-overlay .special-rule-item p {
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  #special-rules-overlay #special-rules-close {
+    height: 26px;
+    min-height: 26px;
+
+    font-size: 12px;
+  }
 }
 
-/* =====================================
-   猫の効果
-   カード公開欄の横スクロール対応
-===================================== */
 
-#reveal-cards:has(.cat-reveal-group) {
+/* ========================================
+   23. トップ画面のルール説明
+======================================== */
+
+#rules-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 10000;
 
   display: flex;
 
-  flex-direction: row;
-  flex-wrap: nowrap;
-
-  align-items: flex-start;
-
-  gap: 12px;
-
-  min-width: 0;
-  width: 100%;
-
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  padding: 8px 4px 12px;
-
-  box-sizing: border-box;
-
-  -webkit-overflow-scrolling: touch;
-
-}
-
-/* プレイヤーごとの枠 */
-
-#reveal-cards .cat-reveal-group {
-
-  flex: 0 0 164px;
-
-  width: 164px;
-
-  box-sizing: border-box;
-
-}
-
-/* 確認ボタンは縮まない */
-
-#reveal-overlay .reveal-panel > .main-button {
-
-  flex-shrink: 0;
-
-}
-
-/* =====================================
-   猫の効果
-   4人分を横一列に収める
-===================================== */
-
-/* カード公開エリア */
-
-#reveal-cards:has(.cat-reveal-group) {
-
-  display: grid;
-
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-
-  gap: 8px;
-
-  width: 100%;
-  min-width: 0;
-
-  overflow-x: hidden;
-  overflow-y: hidden;
-
-  padding: 8px 0;
-
-  box-sizing: border-box;
-
-}
-
-/* プレイヤーごとの枠 */
-
-#reveal-cards .cat-reveal-group {
-
-  width: 100%;
-  min-width: 0;
-
-  padding: 8px 4px;
-
-  box-sizing: border-box;
-
-}
-
-/* 誰から誰へ渡すか */
-
-#reveal-cards .cat-reveal-title {
-
-  font-size: 11px;
-
-  text-align: center;
-
-  white-space: nowrap;
-
-  margin-bottom: 6px;
-
-}
-
-/* カードを中央に表示 */
-
-#reveal-cards .cat-reveal-card-list {
-
-  display: flex;
-
+  align-items: center;
   justify-content: center;
 
-  flex-wrap: wrap;
+  padding: 12px;
 
-  gap: 4px;
-
+  background: rgba(0, 0, 0, 0.85);
 }
 
-/* カードサイズ */
+.rules-panel {
+  display: flex;
+  flex-direction: column;
 
-#reveal-cards .cat-reveal-card-list .reveal-card {
+  width: min(92vw, 850px);
+  max-height: calc(100dvh - 24px);
 
-  width: 48px;
-  height: 68px;
+  padding: 22px;
 
+  background: #f5edd8;
+  color: #29251d;
+
+  border: 3px solid #aa8545;
+  border-radius: 12px;
+
+  overflow: hidden;
+}
+
+.rules-panel h2 {
   flex-shrink: 0;
 
+  margin: 0 0 15px;
+
+  text-align: center;
+  font-size: 25px;
 }
 
-/* 確認ボタン */
-
-#reveal-overlay .reveal-panel > .main-button {
-
-  flex-shrink: 0;
-
-}
-
-/* =====================================
-   ルール説明画面の操作性改善
-===================================== */
-
-/* 説明部分 */
+/* 説明文 */
 
 #rules-overlay .rules-content {
   flex: 1;
@@ -2558,12 +1827,34 @@ button {
   overflow-y: auto;
   overflow-x: hidden;
 
+  padding: 0 12px;
+  padding-right: 12px;
+
   scrollbar-width: auto;
   scrollbar-color: #d4ad65 #263d32;
 
-  padding-right: 12px;
-
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rules-content section {
+  margin-bottom: 20px;
+}
+
+.rules-content h3 {
+  margin: 0 0 8px;
+  padding-bottom: 5px;
+
+  border-bottom: 1px solid #bfa77b;
+
+  font-size: 19px;
+}
+
+.rules-content p {
+  margin: 6px 0;
+
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 /* スクロールバー */
@@ -2579,6 +1870,7 @@ button {
 
 #rules-overlay .rules-content::-webkit-scrollbar-thumb {
   background: #d4ad65;
+
   border-radius: 10px;
   border: 2px solid #263d32;
 }
@@ -2586,15 +1878,19 @@ button {
 /* 下部エリア */
 
 #rules-overlay .rules-footer {
-  flex-shrink: 0;
+  position: relative;
 
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+
   align-items: center;
+  justify-content: flex-end;
 
-  gap: 7px;
+  flex-shrink: 0;
 
-  padding-top: 8px;
+  min-height: 42px;
+
+  padding: 6px 0 0;
 
   border-top: 1px solid #8d7954;
 }
@@ -2602,29 +1898,42 @@ button {
 /* スクロール案内 */
 
 #rules-overlay .rules-scroll-hint {
+  position: absolute;
+
+  left: 50%;
+  transform: translateX(-50%);
+
   display: flex;
+
   align-items: center;
   justify-content: center;
 
   gap: 7px;
 
-  color: #f2d18b;
-  font-size: 12px;
+  margin: 0;
+
+  color: #654315;
+
+  font-size: 13px;
   font-weight: bold;
 
   text-align: center;
+  white-space: nowrap;
 }
-
-/* 下向き矢印 */
 
 #rules-overlay .rules-scroll-arrow {
   display: inline-block;
 
-  animation: rulesArrowMove 1.2s ease-in-out infinite;
+  color: #a16a17;
+  font-size: 16px;
+
+  animation:
+    rulesArrowMove 1.2s ease-in-out infinite;
 }
 
 @keyframes rulesArrowMove {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(-2px);
   }
 
@@ -2633,12 +1942,14 @@ button {
   }
 }
 
-/* 閉じるボタンを小さく */
+/* 閉じるボタン */
 
 #rules-overlay #rules-close {
-  width: 140px;
+  flex-shrink: 0;
+
+  width: 110px;
   min-width: 0;
-  max-width: 140px;
+  max-width: 110px;
 
   min-height: 34px;
 
@@ -2647,14 +1958,124 @@ button {
 
   font-size: 13px;
   border-radius: 8px;
-
-  flex-shrink: 0;
 }
 
-/* 高さの小さい横画面 */
+/* スマホ縦持ち時 */
+
+@media (orientation: portrait) {
+  #rules-overlay {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+
+    width: 100dvh;
+    height: 100dvw;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(90deg);
+
+    transform-origin: center;
+  }
+
+  #rules-overlay .rules-panel {
+    width: min(94%, 850px);
+    max-height: calc(100dvw - 24px);
+
+    padding: 12px 18px;
+  }
+
+  #rules-overlay .rules-panel h2 {
+    margin-bottom: 8px;
+    font-size: 21px;
+  }
+
+  #rules-overlay .rules-content h3 {
+    font-size: 16px;
+  }
+
+  #rules-overlay .rules-content p {
+    font-size: 13px;
+  }
+}
+
+/* 高さが低い横画面 */
+
+@media screen and (orientation: landscape)
+       and (max-height: 600px) {
+  #rules-overlay .rules-panel {
+    display: flex;
+    flex-direction: column;
+
+    width: min(900px, 96vw);
+    max-width: 96vw;
+
+    height: 94dvh;
+    max-height: 94dvh;
+
+    padding: 10px 16px;
+
+    overflow: hidden;
+  }
+
+  #rules-overlay .rules-panel h2 {
+    margin: 0 0 6px;
+
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  #rules-overlay .rules-content {
+    flex: 1 1 auto;
+    min-height: 0;
+
+    overflow-y: auto;
+  }
+
+  #rules-overlay .rules-footer {
+    width: 100%;
+
+    height: 36px;
+    min-height: 36px;
+
+    padding: 4px 0 0;
+    margin: 0;
+  }
+
+  #rules-overlay .rules-scroll-hint {
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  #rules-overlay #rules-close {
+    position: relative;
+
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+
+    height: 28px;
+    min-height: 28px;
+
+    margin: 0;
+    padding: 3px 8px;
+
+    font-size: 12px;
+    line-height: 1.2;
+
+    flex: 0 0 80px;
+  }
+}
+
+/* 高さが低い場合の下部調整 */
 
 @media (max-height: 420px) {
-
   #rules-overlay .rules-footer {
     gap: 4px;
     padding-top: 5px;
@@ -2669,378 +2090,91 @@ button {
     padding: 4px 10px;
     font-size: 12px;
   }
+}
 
+
+/* ========================================
+   24. 非表示の共通処理
+======================================== */
+
+#result-overlay.hidden,
+#reveal-overlay.hidden,
+#rules-overlay.hidden,
+#special-rules-overlay.hidden,
+#return-result-button.hidden {
+  display: none !important;
 }
 
 /* =====================================
-   ルール説明 スクロール案内の色
+   ゲーム開始時の赤の亥を発光
 ===================================== */
 
-#rules-overlay .rules-scroll-hint {
+.hand-card.first-red-boar {
+  outline: 4px solid #ffd700;
+  outline-offset: -3px;
 
-  color: #654315;
+  border-radius: 6px;
 
-  font-size: 13px;
-  font-weight: bold;
-
+  animation:
+    firstRedBoarGlow 1.2s ease-in-out infinite;
 }
 
-/* 下向き矢印 */
-
-#rules-overlay .rules-scroll-arrow {
-
-  color: #a16a17;
-
-  font-size: 16px;
-
-}
-
-/* =====================================
-   ルール説明画面 下部レイアウト
-===================================== */
-
-/* 下部を横並びにする */
-
-#rules-overlay .rules-footer {
-
-  display: flex;
-  flex-direction: row;
-
-  align-items: center;
-  justify-content: flex-end;
-
-  position: relative;
-
-  min-height: 42px;
-
-  padding: 6px 0 0;
-
-}
-
-/* スクロール案内は中央 */
-
-#rules-overlay .rules-scroll-hint {
-
-  position: absolute;
-
-  left: 50%;
-  transform: translateX(-50%);
-
-  white-space: nowrap;
-
-  margin: 0;
-
-}
-
-/* 閉じるボタンは右端 */
-
-#rules-overlay #rules-close {
-
-  width: 110px;
-  min-width: 0;
-  max-width: 110px;
-
-  margin: 0;
-
-  padding: 7px 12px;
-
-  font-size: 13px;
-
-  flex-shrink: 0;
-
-}
-
-
-/* =====================================
-   特殊カード説明
-   スマホでも5枚横並び
-===================================== */
-
-/* 5枚を必ず横一列 */
-
-#special-rules-overlay .special-rules-list {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(5, minmax(0, 1fr));
-
-  gap: 6px;
-
-  width: 100%;
-  min-width: 0;
-
-  overflow-x: hidden;
-  overflow-y: hidden;
-
-}
-
-/* 各カードの枠 */
-
-#special-rules-overlay .special-rule-item {
-
-  min-width: 0;
-
-  padding: 5px 3px;
-
-}
-
-/* カード画像 */
-
-#special-rules-overlay .special-rule-item img {
-
-  width: auto;
-  height: 75px;
-
-  max-width: 100%;
-
-  object-fit: contain;
-
-}
-
-/* カード名 */
-
-#special-rules-overlay .special-rule-item h3 {
-
-  font-size: 12px;
-
-  margin: 5px 0;
-
-}
-
-/* 説明文 */
-
-#special-rules-overlay .special-rule-item p {
-
-  font-size: 10px;
-
-  line-height: 1.35;
-
-  margin: 0;
-
-  overflow-wrap: anywhere;
-
-}
-
-/* ウィンドウ内の余白 */
-
-#special-rules-overlay .special-rules-panel {
-
-  width: min(1100px, 96%);
-
-  padding: 10px;
-
-}
-
-/* タイトル */
-
-#special-rules-overlay .special-rules-panel h2 {
-
-  font-size: 20px;
-
-  margin-bottom: 8px;
-
-}
-
-/* 閉じるボタン */
-
-#special-rules-overlay #special-rules-close {
-
-  width: 120px;
-  max-width: 120px;
-
-  padding: 7px 12px;
-
-  font-size: 13px;
-
-}
-
-/* =====================================
-   最初の赤の亥 案内
-===================================== */
-
-#first-turn-guide {
-  position: fixed;
-  inset: 0;
-  z-index: 500;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  pointer-events: none;
-}
-
-#first-turn-guide.hidden {
-  display: none;
-}
-
-.first-turn-guide-box {
-  background: rgba(18, 43, 31, 0.96);
-
-  border: 3px solid #e3b64e;
-  border-radius: 12px;
-
-  padding: 16px 30px;
-
-  text-align: center;
-
-  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
-}
-
-.first-turn-guide-title {
-  color: #f1cf73;
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.first-turn-guide-text {
-  color: #ffffff;
-  font-size: 25px;
-  font-weight: bold;
-}
-
-.first-turn-guide-sub {
-  color: #e6d5a6;
-  font-size: 15px;
-  margin-top: 8px;
-}
-
-/* スマホ縦持ち時は90度回転 */
-
-@media (orientation: portrait) {
-
-  #first-turn-guide {
-    left: 50%;
-    top: 50%;
-    right: auto;
-    bottom: auto;
-
-    width: 100dvh;
-    height: 100dvw;
-
-    transform: translate(-50%, -50%) rotate(90deg);
-    transform-origin: center;
+@keyframes firstRedBoarGlow {
+
+  0%,
+  100% {
+    box-shadow:
+      0 0 6px #ffd700,
+      0 0 12px #ffb300;
+
+    filter: brightness(1);
   }
 
-  .first-turn-guide-box {
-    padding: 12px 20px;
+  50% {
+    box-shadow:
+      0 0 15px #fff5a0,
+      0 0 28px #ffd700,
+      0 0 40px #ffb300;
+
+    filter: brightness(1.25);
   }
 
 }
 
 /* =====================================
-   ルール説明画面
-   スマホ横持ち専用の調整
+   ルール説明：特殊なカード
 ===================================== */
 
-@media screen and (orientation: landscape)
-       and (max-height: 600px) {
-
-  /* 説明画面全体 */
-  #rules-overlay .rules-panel {
-    width: min(900px, 96vw);
-    max-width: 96vw;
-    height: 94dvh;
-    max-height: 94dvh;
-    padding: 10px 16px;
-    box-sizing: border-box;
-
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  /* タイトル */
-  #rules-overlay .rules-panel h2 {
-    font-size: 18px;
-    margin: 0 0 6px;
-    flex-shrink: 0;
-  }
-
-  /* 説明文の表示領域を広げる */
-  #rules-overlay .rules-content {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-  }
-
-  /* 下部の案内と閉じるボタン */
-  #rules-overlay .rules-footer {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-
-    position: relative;
-    width: 100%;
-    height: 36px;
-    min-height: 36px;
-    padding: 4px 0 0;
-    margin: 0;
-    flex-shrink: 0;
-    box-sizing: border-box;
-  }
-
-  /* スクロール案内 */
-  #rules-overlay .rules-scroll-hint {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-
-    width: auto;
-    margin: 0;
-    padding: 0;
-
-    font-size: 11px;
-    line-height: 1.2;
-    white-space: nowrap;
-    text-align: center;
-  }
-
-  /* 閉じるボタン */
-  #rules-overlay #rules-close {
-    position: relative;
-    width: 80px;
-    min-width: 80px;
-    max-width: 80px;
-    height: 28px;
-    min-height: 28px;
-
-    margin: 0;
-    padding: 3px 8px;
-
-    font-size: 12px;
-    line-height: 1.2;
-    flex: 0 0 80px;
-  }
-
-}
-/* =====================================
-   ゲーム開始案内を一回り小さくする
-===================================== */
-
-/* 案内ウィンドウ */
-.first-turn-guide-box {
-  padding: 12px 22px;
-  border-width: 2px;
+.rule-special-section .rule-special-item {
+  margin-bottom: 18px;
 }
 
-/* ゲーム開始！ */
-.first-turn-guide-title {
+.rule-special-section .rule-special-item strong {
+  display: block;
+
   font-size: 18px;
-  margin-bottom: 5px;
+  font-weight: 800;
+
+  margin-bottom: 4px;
 }
 
-/* 赤の亥を場に出してください */
-.first-turn-guide-text {
-  font-size: 20px;
+.rule-special-section .rule-special-item p {
+  margin: 0;
+
+  font-size: 15px;
+  font-weight: normal;
+
+  line-height: 1.7;
 }
 
-/* 手札の赤い亥を選択してください */
-.first-turn-guide-sub {
-  font-size: 12px;
-  margin-top: 5px;
+.rule-special-section .rule-special-item:last-child {
+  margin-bottom: 0;
+}
+
+/* =====================================
+   スクロール案内の表示切り替え
+===================================== */
+
+.rules-scroll-hint.hidden {
+  display: none !important;
 }
