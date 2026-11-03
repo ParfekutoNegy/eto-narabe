@@ -2854,16 +2854,11 @@ function resizeGame() {
 
   if (!game) return;
 
-// =====================================
-// 画面サイズ取得
-// CSSの配置基準と統一
-// =====================================
+  const width = document.documentElement.clientWidth
+    || window.innerWidth;
 
-const width = document.documentElement.clientWidth
-  || window.innerWidth;
-
-const height = document.documentElement.clientHeight
-  || window.innerHeight;
+  const height = document.documentElement.clientHeight
+    || window.innerHeight;
 
   if (width <= 0 || height <= 0) return;
 
@@ -2881,6 +2876,9 @@ const height = document.documentElement.clientHeight
         width / baseWidth,
         height / baseHeight
       );
+
+  // 配置を一度リセット
+  game.style.transform = "none";
 
   if (portrait) {
 
@@ -3911,3 +3909,11 @@ if ("serviceWorker" in navigator) {
   });
 
 })();
+
+window.addEventListener("orientationchange", () => {
+
+  setTimeout(resizeGame, 100);
+  setTimeout(resizeGame, 300);
+  setTimeout(resizeGame, 600);
+
+});
