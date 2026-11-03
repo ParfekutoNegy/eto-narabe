@@ -2900,8 +2900,12 @@ function resizeGame() {
     const x = (width - displayWidth) / 2;
     const y = (height - displayHeight) / 2;
 
+    // iPhone PWAの表示位置を補正
+    const offsetTop =
+      window.visualViewport?.offsetTop ?? 0;
+
     game.style.transform =
-      `translate(${x}px, ${y}px) scale(${scale})`;
+      `translate(${x}px, ${y + offsetTop}px) scale(${scale})`;
 
   }
 
