@@ -3886,6 +3886,9 @@ if ("serviceWorker" in navigator) {
 
     const rect = button?.getBoundingClientRect();
 
+    // ★ 追加：表示領域の情報
+    const viewport = window.visualViewport;
+
     debug.textContent =
       `診断回数：${count}\n` +
       `タッチ：${Math.round(x)}, ${Math.round(y)}\n` +
@@ -3896,7 +3899,11 @@ if ("serviceWorker" in navigator) {
             ", " +
             Math.round(rect.top + rect.height / 2)
           : "なし"
-      }`;
+      }\n` +
+      `innerHeight：${window.innerHeight}\n` +
+      `clientHeight：${document.documentElement.clientHeight}\n` +
+      `visualHeight：${viewport?.height ?? "なし"}\n` +
+      `offsetTop：${viewport?.offsetTop ?? "なし"}`;
 
   }, {
     capture: true,
