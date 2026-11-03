@@ -3887,14 +3887,27 @@ if ("serviceWorker" in navigator) {
 
 /* =====================================
    タッチ位置とボタン位置の比較
+   ゲーム画面だけで診断
 ===================================== */
 
 document.addEventListener("touchstart", event => {
 
+  const gameScreen =
+    document.getElementById("game-screen");
+
+  if (
+    !gameScreen ||
+    gameScreen.classList.contains("hidden")
+  ) {
+    return;
+  }
+
   const touch = event.touches[0];
   if (!touch) return;
 
-  const button = document.getElementById("play-button");
+  const button =
+    document.getElementById("play-button");
+
   if (!button) return;
 
   const rect = button.getBoundingClientRect();
@@ -3905,22 +3918,46 @@ document.addEventListener("touchstart", event => {
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
 
-  const actual = document.elementFromPoint(x, y);
-  const center = document.elementFromPoint(centerX, centerY);
+  const target = document.elementFromPoint(
+    centerX,
+    centerY
+  );
 
-  console.log("タッチ座標", x, y);
-  console.log("ボタン中心", centerX, centerY);
-  console.log("タッチ先", actual);
-  console.log("ボタン中心の判定", center);
-
-  alert(
+  const result =
     "タッチ座標：" +
     Math.round(x) + "," + Math.round(y) +
     "\nボタン中心：" +
-    Math.round(centerX) + "," + Math.round(centerY) +
+    Math.round(centerX) + "," +
+    Math.round(centerY) +
     "\n中心の判定：" +
-    (center?.id || center?.className || "なし")
-  );
+    (target?.id || target?.className || "なし");
+
+  // 画面に結果を表示
+  let debug =
+    document.getElementById("touch-debug-result");
+
+  if (!debug) {
+
+    debug = document.createElement("div");
+    debug.id = "touch-debug-result";
+
+    debug.style.cssText = `
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 999999;
+      background: rgba(0,0,0,0.9);
+      color: white;
+      padding: 10px;
+      font-size: 13px;
+      white-space: pre-line;
+      pointer-events: none;
+    `;
+
+    document.body.appendChild(debug);
+  }
+
+  debug.textContent = result;
 
 }, {
   capture: true,
