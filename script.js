@@ -472,6 +472,12 @@ function getCpuExpectedOpponentScore(
 // ゲーム終了時の勝敗を推定
 // ========================================
 
+
+/* ========================================
+   CPUのゲーム終了時の勝率予測
+   担当色の推理＋干支順の同点判定
+======================================== */
+
 function evaluateCpuEnding(
   cpu,
   targetField
@@ -479,32 +485,206 @@ function evaluateCpuEnding(
 
   const scores = getFieldScores(targetField);
 
-  const myScore = scores[cpu.color];
+  const colors = getCpuInferenceColors();
 
-  let opponentBest = 0;
+  const availableColors = colors.filter(
+    color => color !== cpu.color
+  );
 
-  players.forEach(opponent => {
+  const opponents = players.filter(
+    player => player.id !== cpu.id
+  );
 
-    if (opponent.id === cpu.id) {
+  const beliefs =
+    cpuColorBeliefs[cpu.id] || {};
+
+  let totalWeight = 0;
+  let winningWeight = 0;
+
+
+  // =====================================
+  // 担当色の組み合わせを評価
+  // =====================================
+
+  function evaluateAssignment(
+    assignment,
+    weight
+  ) {
+
+    totalWeight += weight;
+
+    const assignedColors = {
+      [cpu.id]: cpu.color,
+      ...assignment
+    };
+
+    // 担当者がいる色だけで最高得点を求める
+    const maxScore = Math.max(
+      ...Object.values(assignedColors).map(
+        color => scores[color] || 0
+      )
+    );
+
+    const tiedIds = Object.keys(
+      assignedColors
+    ).filter(id => {
+
+      const color = assignedColors[id];
+
+      return scores[color] === maxScore;
+
+    });
+
+    let winnerId = null;
+
+    if (tiedIds.length === 1) {
+
+      winnerId = Number(tiedIds[0]);
+
+    } else {
+
+      // ===================================
+      // 同点時は子→亥の順番で判定
+      // ===================================
+
+      for (const zodiac of ZODIACS) {
+
+        const pile = targetField[zodiac];
+
+        if (!pile || pile.length === 0) {
+          continue;
+        }
+
+        const top = pile[pile.length - 1];
+
+        const matchedId = tiedIds.find(
+          id =>
+            assignedColors[id] === top.color
+        );
+
+        if (matchedId !== undefined) {
+
+          winnerId = Number(matchedId);
+          break;
+
+        }
+
+      }
+
+    }
+
+    // CPU自身が勝つ組み合わせなら加算
+    if (winnerId === cpu.id) {
+
+      winningWeight += weight;
+
+    }
+
+  }
+
+
+  // =====================================
+  // 組み合わせを再帰的に調べる
+  // =====================================
+
+  function explore(
+    index,
+    usedColors,
+    assignment,
+    weight
+  ) {
+
+    if (index >= opponents.length) {
+
+      evaluateAssignment(
+        assignment,
+        weight
+      );
+
       return;
     }
 
-    const expectedScore =
-      getCpuExpectedOpponentScore(
-        cpu,
-        opponent,
-        scores
-      );
+    const opponent = opponents[index];
 
-    opponentBest = Math.max(
-      opponentBest,
-      expectedScore
+    const belief = beliefs[opponent.id];
+
+    if (!belief) {
+      return;
+    }
+
+    const observations =
+      belief.observations || 0;
+
+    const confidence = Math.min(
+      1,
+      observations / 6
     );
 
-  });
+    const sensitivity =
+      0.35 + confidence * 0.65;
 
-  return myScore - opponentBest;
+    const maxScore = Math.max(
+      ...availableColors.map(
+        color => belief.scores[color] || 0
+      )
+    );
+
+    availableColors.forEach(color => {
+
+      if (usedColors.has(color)) {
+        return;
+      }
+
+      const score =
+        belief.scores[color] || 0;
+
+      const exponent =
+        ((score - maxScore) / 55) *
+        sensitivity;
+
+      const nextWeight =
+        weight * Math.exp(exponent);
+
+      usedColors.add(color);
+
+      assignment[opponent.id] = color;
+
+      explore(
+        index + 1,
+        usedColors,
+        assignment,
+        nextWeight
+      );
+
+      usedColors.delete(color);
+
+      delete assignment[opponent.id];
+
+    });
+
+  }
+
+
+  explore(
+    0,
+    new Set(),
+    {},
+    1
+  );
+
+
+  // =====================================
+  // 勝率を返す（0～1）
+  // =====================================
+
+  if (totalWeight <= 0) {
+    return 0;
+  }
+
+  return winningWeight / totalWeight;
+
 }
+
 
 
 
@@ -1909,31 +2089,25 @@ function evaluateCpuCard(player, card) {
   }
 
 
+
   // =====================================
-  // 7. ゲーム終了時の勝敗予測
+  // 7. ゲーム終了時の勝率予測
   // =====================================
 
   if (isFieldComplete(nextField)) {
 
-    const scoreDifference =
+    const winProbability =
       evaluateCpuEnding(
         player,
         nextField
       );
 
-    if (scoreDifference > 0) {
-
-      points +=
-        5000 + scoreDifference * 100;
-
-    } else {
-
-      points -=
-        5000 + Math.abs(scoreDifference) * 100;
-
-    }
+    // 勝率50%を基準に評価
+    points +=
+      (winProbability - 0.5) * 10000;
 
   }
+
 
 
   // =====================================
@@ -1951,6 +2125,92 @@ function evaluateCpuCard(player, card) {
     points -= myRats * 20;
 
   }
+
+
+
+  // =====================================
+  // 子・丑を少し温存する
+  // =====================================
+
+  if (
+    card.zodiac === "子" ||
+    card.zodiac === "丑"
+  ) {
+
+    // 場に出ている干支の種類数
+    const zodiacCount = ZODIACS.filter(
+      zodiac => field[zodiac].length > 0
+    ).length;
+
+    const pileCount =
+      field[card.zodiac].length;
+
+    let keepPenalty = 0;
+
+    // ===================================
+    // 序盤
+    // ===================================
+
+    if (zodiacCount <= 3) {
+
+      keepPenalty =
+        card.zodiac === "子" ? 20 : 25;
+
+    // ===================================
+    // 中盤
+    // ===================================
+
+    } else if (zodiacCount <= 7) {
+
+      keepPenalty =
+        card.zodiac === "子" ? 12 : 15;
+
+    // ===================================
+    // 終盤
+    // ===================================
+
+    } else if (zodiacCount <= 9) {
+
+      keepPenalty =
+        card.zodiac === "子" ? 5 : 6;
+
+    // ===================================
+    // 最終盤
+    // ===================================
+
+    } else {
+
+      keepPenalty = 0;
+
+    }
+
+    // ===================================
+    // 山の3枚目・4枚目は温存を弱める
+    // ===================================
+
+    if (pileCount === 2) {
+
+      keepPenalty *= 0.5;
+
+    } else if (pileCount === 3) {
+
+      keepPenalty = 0;
+
+    }
+
+    // ===================================
+    // ゲーム終了時は勝敗予測を優先
+    // ===================================
+
+    if (!isFieldComplete(nextField)) {
+
+      points -= keepPenalty;
+
+    }
+
+  }
+
+
 
 
   // =====================================
@@ -2022,23 +2282,29 @@ function chooseCpuPlay(player) {
     // 推理に基づく勝敗予測
     // ===================================
 
-    const scoreDifference =
+
+    // ===================================
+    // 干支順を含めた勝率予測
+    // ===================================
+
+    const winProbability =
       evaluateCpuEnding(
         player,
         nextField
       );
 
-    if (scoreDifference > 0) {
+    if (winProbability > 0.5) {
 
-      // 推理上、自分が有利
+      // 勝率50%超なら終了候補
       winningCards.push(card);
 
     } else {
 
-      // 推理上、自分が不利または同点
+      // 勝率50%以下なら慎重に判断
       endingCards.push(card);
 
     }
+
 
 
   });
@@ -2191,6 +2457,33 @@ function chooseCpuPass(player) {
     if (card.zodiac === "猫") {
       points -= 100;
     }
+
+
+
+    // ===================================
+    // 干支の番号が大きいカードを渡しやすくする
+    // ===================================
+
+    if (card.zodiac !== "猫") {
+
+      const zodiacNumber =
+        ZODIACS.indexOf(card.zodiac) + 1;
+
+      // 1（子）から12（亥）まで
+      // 数字が大きいほど渡す評価を上げる
+      points += (zodiacNumber - 1) * 2;
+
+      // 子・丑は特に温存する
+      if (card.zodiac === "子") {
+        points -= 5;
+      }
+
+      if (card.zodiac === "丑") {
+        points -= 8;
+      }
+
+    }
+
 
     // ===================================
     // 6. ランダム性
@@ -3188,7 +3481,7 @@ function showResult() {
   // =====================================
 
   overlay.appendChild(panel);
-  document.body.appendChild(overlay);
+  $("app").appendChild(overlay);
 
 }
 
@@ -3616,34 +3909,38 @@ $("setup-screen").classList.remove("hidden");
 // ========================================
 
 
-function resizeGame() {
 
-  const game = $("game-board");
-  const screen = $("game-screen");
+/* ========================================
+   全画面共通の回転・縮小処理
+   基準サイズ：1280 × 720
+======================================== */
 
-  if (!game || !screen) return;
+function resizeApp() {
 
-  // =====================================
-  // ゲーム画面の実際の表示領域
-  // =====================================
+  const app = document.getElementById("app");
 
-  const width = screen.clientWidth;
-  const height = screen.clientHeight;
+  if (!app) {
+    return;
+  }
 
-  if (width <= 0 || height <= 0) return;
+  const viewport = window.visualViewport;
 
-  // =====================================
-  // 基準サイズ
-  // =====================================
+  const width = viewport
+    ? viewport.width
+    : window.innerWidth;
+
+  const height = viewport
+    ? viewport.height
+    : window.innerHeight;
+
+  if (width <= 0 || height <= 0) {
+    return;
+  }
 
   const baseWidth = 1280;
   const baseHeight = 720;
 
   const portrait = height > width;
-
-  // =====================================
-  // 拡大縮小率
-  // =====================================
 
   const scale = portrait
     ? Math.min(
@@ -3655,9 +3952,10 @@ function resizeGame() {
         height / baseHeight
       );
 
-  // =====================================
-  // 配置
-  // =====================================
+  app.style.width = `${baseWidth}px`;
+  app.style.height = `${baseHeight}px`;
+
+  app.style.transformOrigin = "top left";
 
   if (portrait) {
 
@@ -3667,7 +3965,7 @@ function resizeGame() {
     const x = (width - displayWidth) / 2;
     const y = (height - displayHeight) / 2;
 
-    game.style.transform =
+    app.style.transform =
       `translate(${x + displayWidth}px, ${y}px) ` +
       `rotate(90deg) scale(${scale})`;
 
@@ -3679,12 +3977,18 @@ function resizeGame() {
     const x = (width - displayWidth) / 2;
     const y = (height - displayHeight) / 2;
 
-    game.style.transform =
+    app.style.transform =
       `translate(${x}px, ${y}px) scale(${scale})`;
 
   }
 
 }
+
+// 既存の呼び出しとの互換性
+function resizeGame() {
+  resizeApp();
+}
+
 
 function showRevealModal(title, description, cards) {
 
@@ -3800,7 +4104,7 @@ async function showSpecialEffect(message, duration = 900) {
 
   element.textContent = message;
 
-  document.body.appendChild(element);
+  $("app").appendChild(element);
 
   // ゲーム終了時に削除できるよう登録
   activeAnimations.add(element);
@@ -4276,66 +4580,7 @@ function stopCurrentGame() {
 
 
 function resizeSetup() {
-
-  const panel = document.querySelector(
-    ".setup-panel"
-  );
-
-  if (!panel) return;
-
-// =====================================
-// 画面サイズ取得
-// CSSの配置基準と統一
-// =====================================
-
-const width = document.documentElement.clientWidth
-  || window.innerWidth;
-
-const height = document.documentElement.clientHeight
-  || window.innerHeight;
-
-  if (width <= 0 || height <= 0) return;
-
-  const baseWidth = 1280;
-  const baseHeight = 720;
-
-  const portrait = height > width;
-
-  const scale = portrait
-    ? Math.min(
-        width / baseHeight,
-        height / baseWidth
-      )
-    : Math.min(
-        width / baseWidth,
-        height / baseHeight
-      );
-
-  if (portrait) {
-
-    const displayWidth = baseHeight * scale;
-    const displayHeight = baseWidth * scale;
-
-    const x = (width - displayWidth) / 2;
-    const y = (height - displayHeight) / 2;
-
-    panel.style.transform =
-      `translate(${x + displayWidth}px, ${y}px) ` +
-      `rotate(90deg) scale(${scale})`;
-
-  } else {
-
-    const displayWidth = baseWidth * scale;
-    const displayHeight = baseHeight * scale;
-
-    const x = (width - displayWidth) / 2;
-    const y = (height - displayHeight) / 2;
-
-    panel.style.transform =
-      `translate(${x}px, ${y}px) scale(${scale})`;
-
-  }
-
+  resizeApp();
 }
 
 
@@ -4450,9 +4695,9 @@ $("rules-close").addEventListener(
 let layoutUpdateFrame = null;
 let layoutUpdateTimer = null;
 
+
 function updateScreenLayout() {
 
-  // 同じフレーム内の重複更新を防止
   if (layoutUpdateFrame !== null) {
     cancelAnimationFrame(layoutUpdateFrame);
   }
@@ -4461,12 +4706,12 @@ function updateScreenLayout() {
 
     layoutUpdateFrame = null;
 
-    resizeSetup();
-    resizeGame();
+    resizeApp();
 
   });
 
 }
+
 
 function scheduleScreenLayout() {
 

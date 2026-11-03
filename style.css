@@ -1,7 +1,7 @@
 
 /* ========================================
-   干支並べ style.css
-   整理版
+   干支並べ style.css 修正版
+   第1回：共通設定・トップ・ゲーム盤面
    基準画面：1280 × 720
 ======================================== */
 
@@ -35,7 +35,6 @@ body {
 
   background: #172c24;
   color: #ffffff;
-
   touch-action: manipulation;
 }
 
@@ -56,9 +55,31 @@ button {
   display: none !important;
 }
 
+/*
+   画面全体の回転・縮小は
+   script.js の resizeApp() が担当する。
+*/
+#app {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
+
+  overflow: hidden;
+  transform-origin: top left;
+}
+
 .screen {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
+
+  overflow: hidden;
 }
 
 .main-button {
@@ -81,11 +102,12 @@ button {
 ======================================== */
 
 #setup-screen {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 
-  width: 100%;
-  height: 100%;
+  width: 1280px;
+  height: 720px;
 
   padding: 0;
   overflow: hidden;
@@ -109,10 +131,13 @@ button {
     no-repeat;
 
   text-align: center;
+
+  /* 個別の回転・縮小は行わない */
+  transform: none;
   transform-origin: top left;
 }
 
-/* タイトル・見出しは画像に描画済み */
+/* タイトル・見出しは背景画像に描画済み */
 
 #setup-screen .setup-title,
 #setup-screen .setup-heading,
@@ -161,7 +186,7 @@ button {
   cursor: pointer;
 }
 
-/* 選択中の人数だけ枠を強く発光 */
+/* 選択中の人数だけ枠を発光 */
 
 #setup-screen .player-option.active {
   background: transparent;
@@ -278,14 +303,14 @@ button {
   top: 0;
   left: 0;
 
-  width: 100%;
-  height: 100%;
+  width: 1280px;
+  height: 720px;
 
   overflow: hidden;
 }
 
 #game-board {
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
 
@@ -293,14 +318,17 @@ button {
   height: 720px;
 
   display: grid;
+
   grid-template-rows:
     106px
     400px
     214px;
 
   background: #303438;
-
   overflow: hidden;
+
+  /* ゲーム盤面を個別に回転させない */
+  transform: none;
   transform-origin: top left;
 }
 
@@ -397,7 +425,6 @@ button {
   padding: 6px 7px;
 
   border-radius: 7px;
-
   color: #ffffff;
 
   font-size: 14px;
@@ -524,7 +551,6 @@ button {
   align-items: flex-start;
 
   min-width: 0;
-
   padding-top: 5px;
 
   border: 1px dashed #8ea68b;
@@ -686,7 +712,6 @@ button {
   overflow: hidden;
 
   border-radius: 10px;
-
   background: #203b2c;
 }
 
@@ -1057,7 +1082,7 @@ button {
   white-space: nowrap;
 }
 
-/* 予想色 */
+/* CPU担当色の予想 */
 
 .player-panel .cpu-prediction-text {
   margin-top: 2px;
@@ -1069,7 +1094,7 @@ button {
   white-space: nowrap;
 }
 
-/* CPU2 */
+/* 上側CPU */
 
 #cpu-top {
   top: -5px;
@@ -1165,13 +1190,7 @@ button {
    17. CPU色選択画面
 ======================================== */
 
-
-/* ========================================
-   17. CPU色選択画面
-======================================== */
-
 #game-board > #cpu-color-picker {
-
   position: absolute;
 
   top: 0;
@@ -1185,16 +1204,14 @@ button {
   z-index: 30000;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   background: rgba(0, 0, 0, 0.65);
 
+  /* #app 全体の回転を利用 */
   transform: none;
-
 }
-
 
 .cpu-picker-panel {
   width: max-content;
@@ -1289,7 +1306,7 @@ button {
     transform 0.15s;
 }
 
-/* 戻るボタンは100px */
+/* 戻るボタン */
 
 .top-area .top-right > #back-button {
   width: 100px;
@@ -1354,7 +1371,6 @@ button {
   padding: 0;
 
   opacity: 0;
-
   cursor: pointer;
   z-index: 2;
 }
@@ -1389,6 +1405,7 @@ button {
 
   font-size: 26px;
   font-weight: bold;
+
   white-space: nowrap;
 }
 
@@ -1547,6 +1564,7 @@ button {
   filter: grayscale(60%);
 
   cursor: not-allowed;
+
   box-shadow: none;
   transform: none;
 }
@@ -1557,7 +1575,7 @@ button {
 ======================================== */
 
 .special-effect-message {
-  position: fixed;
+  position: absolute;
 
   left: 50%;
   top: 50%;
@@ -1567,7 +1585,7 @@ button {
   z-index: 15000;
 
   width: 620px;
-  max-width: 90vw;
+  max-width: 1100px;
 
   padding: 20px 28px;
 
@@ -1592,46 +1610,37 @@ button {
   pointer-events: none;
 }
 
+/* 表示時のアニメーション */
+
 .special-effect-message.show {
-  animation: specialEffectAppear 0.25s ease-out;
+  animation:
+    specialEffectAppear 0.25s ease-out;
 }
 
 @keyframes specialEffectAppear {
   from {
     opacity: 0;
-    transform: translate(-50%, -65%) scale(0.9);
+
+    transform:
+      translate(-50%, -65%)
+      scale(0.9);
   }
 
   to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-@media (orientation: portrait) {
-  .special-effect-message {
-    width: 620px;
-    max-width: calc(100dvh - 40px);
-
-    padding: 15px 20px;
-
-    font-size: 22px;
 
     transform:
       translate(-50%, -50%)
-      rotate(90deg);
-
-    transform-origin: center;
-  }
-
-  .special-effect-message.show {
-    animation: none;
-
-    transform:
-      translate(-50%, -50%)
-      rotate(90deg);
+      scale(1);
   }
 }
+
+/*
+   縦向き端末でも個別回転しない。
+
+   #app が回転するため、
+   メッセージは通常の向きのままでよい。
+*/
 
 
 /* ========================================
@@ -1639,28 +1648,41 @@ button {
 ======================================== */
 
 #reveal-overlay {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
 
   z-index: 20000;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  padding: 8px;
+  padding: 12px;
 
   overflow: hidden;
 
-  background: #000c;
+  background: rgba(0, 0, 0, 0.8);
+
+  transform: none;
 }
+
+/* 手札公開パネル */
 
 .reveal-panel {
   display: flex;
   flex-direction: column;
 
-  width: min(94vw, 850px);
-  max-height: calc(100dvh - 16px);
+  width: 850px;
+  max-width: 1200px;
+
+  height: auto;
+  max-height: 680px;
 
   padding: 12px 18px;
 
@@ -1675,14 +1697,19 @@ button {
   text-align: center;
 }
 
+/* タイトル */
+
 .reveal-panel h2 {
   flex-shrink: 0;
 
   margin: 0 0 5px;
 
   color: #f1d58b;
+
   font-size: 21px;
 }
+
+/* 説明文 */
 
 #reveal-description {
   flex-shrink: 0;
@@ -1693,24 +1720,33 @@ button {
   line-height: 1.4;
 }
 
+/* 公開カード一覧 */
+
 #reveal-cards {
   display: flex;
 
-  flex: 1;
+  flex: 1 1 auto;
+
   flex-wrap: wrap;
+
   justify-content: center;
+  align-content: flex-start;
 
   min-height: 0;
 
   gap: 8px;
+
   margin: 5px 0 10px;
 
   overflow-y: auto;
   overflow-x: hidden;
 
   overscroll-behavior: contain;
+
   -webkit-overflow-scrolling: touch;
 }
+
+/* 公開カード */
 
 .reveal-card {
   position: relative;
@@ -1723,12 +1759,24 @@ button {
   transition: transform 0.25s ease;
 }
 
+.reveal-card img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* 画像がない場合の仮カード */
+
 .reveal-card.card-placeholder .card-zodiac {
   font-size: 25px;
 }
 
+/* 確認ボタン */
+
 .reveal-panel .main-button {
   flex-shrink: 0;
+
   align-self: center;
 
   width: 220px;
@@ -1739,10 +1787,19 @@ button {
   font-size: 15px;
 }
 
-/* 猫の公開画面 */
+
+/* ========================================
+   24-1. 猫カード使用時の公開画面
+======================================== */
+
+/*
+   猫の効果では、
+   プレイヤーごとに「子」のカードを表示する。
+*/
 
 #reveal-cards:has(.cat-reveal-group) {
   flex-wrap: nowrap;
+
   justify-content: center;
   align-items: flex-start;
 
@@ -1755,6 +1812,8 @@ button {
 
   padding: 8px 0;
 }
+
+/* プレイヤーごとのグループ */
 
 .cat-reveal-group {
   flex: 0 0 auto;
@@ -1770,6 +1829,8 @@ button {
   border-radius: 9px;
 }
 
+/* プレイヤー名 */
+
 .cat-reveal-title {
   margin-bottom: 6px;
 
@@ -1782,49 +1843,26 @@ button {
   white-space: nowrap;
 }
 
+/* 子カードの一覧 */
+
 .cat-reveal-card-list {
   display: flex;
+
   flex-wrap: nowrap;
 
   justify-content: center;
   align-items: center;
 
   gap: 4px;
+
   min-width: 100px;
 }
+
+/* 猫公開時のカードは少し小さくする */
 
 .cat-reveal-card-list .reveal-card {
   width: 48px;
   height: 68px;
-}
-
-@media (orientation: portrait) {
-  #reveal-overlay {
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-
-    width: 100dvh;
-    height: 100dvw;
-
-    transform:
-      translate(-50%, -50%)
-      rotate(90deg);
-
-    transform-origin: center;
-  }
-
-  #reveal-overlay .reveal-panel {
-    width: min(94%, 850px);
-    max-height: calc(100dvw - 16px);
-  }
-}
-
-@media (max-height: 500px) {
-  #reveal-cards {
-    max-height: 35vh;
-  }
 }
 
 
@@ -1833,19 +1871,31 @@ button {
 ======================================== */
 
 #result-overlay {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
 
   z-index: 10000;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  padding: 8px;
+  padding: 12px;
+
+  overflow: hidden;
 
   background: rgba(0, 0, 0, 0.72);
+
+  transform: none;
 }
+
+/* 結果パネル */
 
 #result-overlay .result-panel {
   display: flex;
@@ -1853,12 +1903,15 @@ button {
 
   align-items: center;
 
-  width: min(90vw, 230px);
-  max-height: calc(100dvh - 12px);
+  width: 400px;
+  max-width: 1200px;
 
-  padding: 18px 12px;
+  max-height: 680px;
 
-  overflow: hidden;
+  padding: 18px 20px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
 
   background: #243b30;
   color: #ffffff;
@@ -1869,121 +1922,87 @@ button {
   text-align: center;
 }
 
+/* リザルトタイトル */
+
 #result-overlay .result-panel h2 {
   margin: 0 0 8px;
 
   color: #f1d78f;
 
-  font-size: 20px;
-  line-height: 1.2;
+  font-size: 26px;
+  font-weight: bold;
 }
 
-
-/* 勝者表示を大きく強調 */
+/* 勝者表示 */
 
 #result-overlay .result-panel h3 {
-  margin: 4px 0 18px;
+  margin: 8px 0 12px;
 
-  font-size: 23px;
+  color: #ffe5a1;
+
+  font-size: 22px;
   font-weight: bold;
   line-height: 1.4;
-
-  color: #ffe08a;
-
-  text-shadow:
-    1px 1px 2px #000000,
-    0 0 10px rgba(255, 210, 70, 0.5);
 }
 
+/* プレイヤーごとの結果 */
 
 #result-overlay .result-row {
   display: flex;
-  justify-content: space-between;
+
   align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
 
   width: 100%;
-  min-height: 30px;
 
-  gap: 6px;
-  padding: 6px 4px;
+  margin: 4px 0;
+  padding: 9px 12px;
 
-  border-bottom: 1px solid #63786c;
+  background: rgba(255, 255, 255, 0.08);
 
-  font-size: 12px;
-  line-height: 1.3;
-}
-
-#result-overlay .result-row.winner {
-  background: rgba(213, 179, 108, 0.24);
-  font-weight: bold;
-}
-
-#result-overlay .result-row span:first-child {
-  flex: 1;
-  min-width: 0;
-
-  text-align: left;
-  white-space: nowrap;
-}
-
-#result-overlay .result-row span:last-child {
-  width: 30px;
-  flex-shrink: 0;
-
-  text-align: right;
-  white-space: nowrap;
-}
-
-#result-overlay .result-panel .main-button {
-  display: block;
-
-  width: 100%;
-  min-height: 36px;
-
-  margin: 10px 0 0;
-  padding: 7px 6px;
-
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
 
-  font-size: 12px;
+  font-size: 17px;
+}
+
+/* 勝者の行 */
+
+#result-overlay .result-row.winner {
+  background: rgba(255, 207, 77, 0.18);
+
+  border: 2px solid #ffd34d;
+
+  color: #ffe8a1;
   font-weight: bold;
-  line-height: 1.2;
 }
 
+/* プレイヤー名 */
 
-
-@media (max-height: 380px) {
-
-  #result-overlay .result-panel h3 {
-    margin-bottom: 9px;
-    font-size: 20px;
-  }
-
-  #result-overlay .result-panel .main-button {
-    min-height: 34px;
-
-    margin-top: 7px;
-    padding: 5px 6px;
-
-    font-size: 12px;
-  }
-
+#result-overlay .result-row span:first-child {
+  text-align: left;
+  font-weight: bold;
 }
 
+/* 得点 */
 
+#result-overlay .result-row span:last-child {
+  text-align: right;
+  font-weight: bold;
+}
 
-/* ========================================
-   リザルト画面の立体ボタン
-======================================== */
+/* リザルト内のボタン */
 
 #result-overlay .result-panel .main-button {
-  display: block;
+  flex-shrink: 0;
 
   width: 100%;
-  min-height: 42px;
+  min-height: 48px;
 
-  margin: 12px 0 0;
-  padding: 8px 6px;
+  margin-top: 12px;
+  padding: 10px 16px;
 
   background:
     linear-gradient(
@@ -2001,9 +2020,8 @@ button {
     0 4px 0 #1a3828,
     0 6px 8px rgba(0, 0, 0, 0.35);
 
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
-  line-height: 1.2;
 
   cursor: pointer;
 
@@ -2013,7 +2031,7 @@ button {
     transform 0.15s;
 }
 
-/* マウスを乗せたとき */
+/* ホバー */
 
 #result-overlay .result-panel .main-button:hover {
   background:
@@ -2034,124 +2052,54 @@ button {
     0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* 最後のボタンも同じデザイン */
+/* 最後のボタン */
 
 #result-overlay .result-panel .main-button:last-child {
-  background:
-    linear-gradient(
-      to bottom,
-      #5c8f70,
-      #315b43
-    );
-
-  color: #ffffff;
-
-  border: 2px solid #8fbea0;
+  margin-bottom: 4px;
 }
-
 
 
 /* ========================================
-   26. 終了盤面確認
-======================================== */
-
-
-/* ========================================
-   ゲーム結果画面に戻るボタン
-======================================== */
-
-#return-result-button {
-  position: absolute;
-
-  left: 50%;
-  top: 70%;
-
-  transform: translate(-50%, -50%);
-
-  z-index: 500;
-
-  padding: 12px 24px;
-
-  background:
-    linear-gradient(
-      to bottom,
-      #5c8f70,
-      #315b43
-    );
-
-  color: #ffffff;
-
-  border: 2px solid #8fbea0;
-  border-radius: 10px;
-
-  box-shadow:
-    0 4px 0 #1a3828,
-    0 6px 8px rgba(0, 0, 0, 0.35);
-
-  font-size: 24px;
-  font-weight: bold;
-
-  white-space: nowrap;
-  cursor: pointer;
-
-  transition:
-    background 0.15s,
-    box-shadow 0.15s,
-    transform 0.15s;
-}
-
-/* マウスを乗せたとき */
-
-#return-result-button:hover {
-  background:
-    linear-gradient(
-      to bottom,
-      #79b58e,
-      #427b59
-    );
-}
-
-/* 押したとき */
-
-#return-result-button:active {
-  transform:
-    translate(-50%, -50%)
-    translateY(3px);
-
-  box-shadow:
-    0 1px 0 #1a3828,
-    0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-
-
-/* ========================================
-   27. 特殊カード説明画面
+   26. 特殊カード説明画面
+   基準：1280 × 720
 ======================================== */
 
 #special-rules-overlay {
-  position: fixed;
-  inset: 0;
+  position: absolute;
 
-  z-index: 10000;
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
+
+  z-index: 20000;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
+  padding: 12px;
   overflow: hidden;
 
   background: rgba(0, 0, 0, 0.78);
+
+  transform: none;
 }
 
+/* 説明パネル */
+
 #special-rules-overlay .special-rules-panel {
+  position: relative;
+
   display: flex;
   flex-direction: column;
-
   align-items: stretch;
 
-  width: min(900px, 96vw);
-  height: min(640px, 96dvh);
+  width: 900px;
+  height: 640px;
+
+  flex: 0 0 auto;
 
   gap: 6px;
   padding: 10px 16px;
@@ -2163,7 +2111,11 @@ button {
 
   border: 3px solid #b79a63;
   border-radius: 14px;
+
+  transform: none;
 }
+
+/* タイトル */
 
 #special-rules-overlay .special-rules-panel h2 {
   flex: 0 0 auto;
@@ -2172,9 +2124,10 @@ button {
 
   font-size: 20px;
   line-height: 1.2;
-
   text-align: center;
 }
+
+/* 特殊カード5種類の一覧 */
 
 #special-rules-overlay .special-rules-list {
   display: grid;
@@ -2190,6 +2143,8 @@ button {
   gap: 5px;
   overflow: hidden;
 }
+
+/* 各カードの説明行 */
 
 #special-rules-overlay .special-rule-item {
   display: flex;
@@ -2212,23 +2167,29 @@ button {
   border-radius: 10px;
 }
 
+/* カード画像 */
+
 #special-rules-overlay .special-rule-item img {
   display: block;
+
   flex: 0 0 auto;
 
   width: auto;
   height: 100%;
-
   max-height: 100%;
 
   border-radius: 5px;
   object-fit: contain;
 }
 
+/* 説明テキスト領域 */
+
 #special-rules-overlay .special-rule-item > div {
   flex: 1 1 auto;
   min-width: 0;
 }
+
+/* 干支名 */
 
 #special-rules-overlay .special-rule-item h3 {
   margin: 0 0 3px;
@@ -2237,12 +2198,16 @@ button {
   line-height: 1.2;
 }
 
+/* 効果説明 */
+
 #special-rules-overlay .special-rule-item p {
   margin: 0;
 
   font-size: 13px;
   line-height: 1.3;
 }
+
+/* 閉じるボタン */
 
 #special-rules-overlay #special-rules-close {
   flex: 0 0 auto;
@@ -2258,77 +2223,45 @@ button {
   font-size: 13px;
 }
 
-@media (orientation: portrait) {
-  #special-rules-overlay .special-rules-panel {
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    width: 96dvh;
-    height: 96dvw;
-
-    transform:
-      translate(-50%, -50%)
-      rotate(90deg);
-
-    transform-origin: center;
-  }
-}
-
-@media (orientation: landscape) and (max-height: 600px) {
-  #special-rules-overlay .special-rules-panel {
-    width: 96vw;
-    height: 96dvh;
-
-    padding: 6px 12px;
-  }
-
-  #special-rules-overlay .special-rules-panel h2 {
-    font-size: 16px;
-  }
-
-  #special-rules-overlay .special-rule-item {
-    padding: 2px 6px;
-    gap: 10px;
-  }
-
-  #special-rules-overlay .special-rule-item h3 {
-    font-size: 13px;
-  }
-
-  #special-rules-overlay .special-rule-item p {
-    font-size: 11px;
-    line-height: 1.2;
-  }
-}
-
 
 /* ========================================
-   28. 遊び方説明画面
+   27. 遊び方説明画面
 ======================================== */
 
 #rules-overlay {
-  position: fixed;
-  inset: 0;
+  position: absolute;
 
-  z-index: 10000;
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
+
+  z-index: 20000;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   padding: 12px;
+  overflow: hidden;
 
   background: rgba(0, 0, 0, 0.85);
+
+  transform: none;
 }
 
-.rules-panel {
+/* 遊び方パネル */
+
+#rules-overlay .rules-panel {
   display: flex;
   flex-direction: column;
 
-  width: min(92vw, 850px);
-  max-height: calc(100dvh - 24px);
+  width: 850px;
+  height: 640px;
+  max-height: 680px;
+
+  flex: 0 0 auto;
 
   padding: 22px;
 
@@ -2339,9 +2272,12 @@ button {
   border-radius: 12px;
 
   overflow: hidden;
+  transform: none;
 }
 
-.rules-panel h2 {
+/* タイトル */
+
+#rules-overlay .rules-panel h2 {
   flex-shrink: 0;
 
   margin: 0 0 15px;
@@ -2350,8 +2286,10 @@ button {
   font-size: 25px;
 }
 
+/* 説明文スクロール領域 */
+
 #rules-overlay .rules-content {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
 
   overflow-y: auto;
@@ -2366,11 +2304,15 @@ button {
   -webkit-overflow-scrolling: touch;
 }
 
-.rules-content section {
+/* 各項目 */
+
+#rules-overlay .rules-content section {
   margin-bottom: 20px;
 }
 
-.rules-content h3 {
+/* 項目見出し */
+
+#rules-overlay .rules-content h3 {
   margin: 0 0 8px;
   padding-bottom: 5px;
 
@@ -2379,18 +2321,22 @@ button {
   font-size: 19px;
 }
 
-.rules-content p {
+/* 説明文 */
+
+#rules-overlay .rules-content p {
   margin: 6px 0;
 
   font-size: 15px;
   line-height: 1.7;
 }
 
-.rule-special-section .rule-special-item {
+/* 特殊カードの項目 */
+
+#rules-overlay .rule-special-section .rule-special-item {
   margin-bottom: 18px;
 }
 
-.rule-special-section .rule-special-item strong {
+#rules-overlay .rule-special-section .rule-special-item strong {
   display: block;
 
   margin-bottom: 4px;
@@ -2399,12 +2345,14 @@ button {
   font-weight: 800;
 }
 
-.rule-special-section .rule-special-item p {
+#rules-overlay .rule-special-section .rule-special-item p {
   margin: 0;
 
   font-size: 15px;
   line-height: 1.7;
 }
+
+/* スクロールバー */
 
 #rules-overlay .rules-content::-webkit-scrollbar {
   width: 9px;
@@ -2422,7 +2370,10 @@ button {
   border-radius: 10px;
 }
 
-/* 下部 */
+
+/* ========================================
+   28. 遊び方画面の下部
+======================================== */
 
 #rules-overlay .rules-footer {
   position: relative;
@@ -2434,16 +2385,17 @@ button {
   flex-shrink: 0;
 
   min-height: 42px;
-
   padding: 6px 0 0;
 
   border-top: 1px solid #8d7954;
 }
 
+/* スクロール案内 */
+
 #rules-overlay .rules-scroll-hint {
   position: absolute;
-
   left: 50%;
+
   transform: translateX(-50%);
 
   display: flex;
@@ -2460,13 +2412,16 @@ button {
   white-space: nowrap;
 }
 
+/* 下向き矢印 */
+
 #rules-overlay .rules-scroll-arrow {
   display: inline-block;
 
   color: #a16a17;
   font-size: 16px;
 
-  animation: rulesArrowMove 1.2s ease-in-out infinite;
+  animation:
+    rulesArrowMove 1.2s ease-in-out infinite;
 }
 
 @keyframes rulesArrowMove {
@@ -2479,6 +2434,8 @@ button {
     transform: translateY(3px);
   }
 }
+
+/* 閉じるボタン */
 
 #rules-overlay #rules-close {
   flex-shrink: 0;
@@ -2495,91 +2452,19 @@ button {
   border-radius: 8px;
 }
 
-@media (orientation: portrait) {
-  #rules-overlay {
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-
-    width: 100dvh;
-    height: 100dvw;
-
-    transform:
-      translate(-50%, -50%)
-      rotate(90deg);
-
-    transform-origin: center;
-  }
-
-  #rules-overlay .rules-panel {
-    width: min(94%, 850px);
-    max-height: calc(100dvw - 24px);
-
-    padding: 12px 18px;
-  }
-
-  #rules-overlay .rules-panel h2 {
-    font-size: 21px;
-  }
-
-  #rules-overlay .rules-content h3 {
-    font-size: 16px;
-  }
-
-  #rules-overlay .rules-content p {
-    font-size: 13px;
-  }
-}
-
-@media (orientation: landscape) and (max-height: 600px) {
-  #rules-overlay .rules-panel {
-    width: min(900px, 96vw);
-    height: 94dvh;
-    max-height: 94dvh;
-
-    padding: 10px 16px;
-  }
-
-  #rules-overlay .rules-panel h2 {
-    margin-bottom: 6px;
-    font-size: 18px;
-  }
-
-  #rules-overlay .rules-footer {
-    height: 36px;
-    min-height: 36px;
-  }
-
-  #rules-overlay .rules-scroll-hint {
-    top: 50%;
-    transform: translate(-50%, -50%);
-
-    font-size: 11px;
-  }
-
-  #rules-overlay #rules-close {
-    width: 80px;
-    min-width: 80px;
-    max-width: 80px;
-
-    height: 28px;
-    min-height: 28px;
-
-    padding: 3px 8px;
-
-    font-size: 12px;
-  }
-}
-
 
 /* ========================================
    29. 干支のはなし
 ======================================== */
 
 #eto-story-overlay {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
 
   z-index: 20000;
 
@@ -2587,15 +2472,25 @@ button {
   align-items: center;
   justify-content: center;
 
+  padding: 12px;
+  overflow: hidden;
+
   background: rgba(0, 0, 0, 0.75);
+
+  transform: none;
 }
 
-.eto-story-panel {
+/* 干支のはなしパネル */
+
+#eto-story-overlay .eto-story-panel {
   display: flex;
   flex-direction: column;
 
-  width: min(850px, 94vw);
-  max-height: 90dvh;
+  width: 850px;
+  height: 640px;
+  max-height: 680px;
+
+  flex: 0 0 auto;
 
   padding: 20px 30px;
 
@@ -2606,38 +2501,121 @@ button {
   border-radius: 18px;
 
   box-shadow: 0 8px 30px #0008;
+
+  overflow: hidden;
+  transform: none;
 }
 
-.eto-story-panel h2 {
+/* タイトル */
+
+#eto-story-overlay .eto-story-panel h2 {
   margin: 0 0 12px;
 
   text-align: center;
-  font-size: 32px;
 
+  font-size: 32px;
   color: #9c390f;
 }
 
-.eto-story-content {
-  flex: 1;
+/* 物語の本文 */
+
+#eto-story-overlay .eto-story-content {
+  flex: 1 1 auto;
   min-height: 0;
 
   overflow-y: auto;
+  overflow-x: hidden;
 
   font-size: 20px;
   line-height: 1.7;
+
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
-.eto-story-content h3 {
+/* 本文の小見出し */
+
+#eto-story-overlay .eto-story-content h3 {
   color: #a45a13;
 }
 
-#eto-story-close {
+
+/* ========================================
+   30. 干支のはなし：下部操作
+======================================== */
+
+#eto-story-overlay .eto-story-footer {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* 前へ・次へ */
+
+#eto-story-overlay .eto-story-navigation {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 20px;
+  width: 100%;
+}
+
+#eto-story-overlay #eto-story-prev,
+#eto-story-overlay #eto-story-next {
+  min-width: 110px;
+  min-height: 42px;
+
+  padding: 7px 18px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #dcae56,
+      #ad792b
+    );
+
+  color: #ffffff;
+
+  border: 2px solid #8e5f24;
+  border-radius: 9px;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+/* ページ番号 */
+
+#eto-story-overlay #eto-story-page {
+  min-width: 90px;
+
+  color: #704319;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  text-align: center;
+}
+
+/* 閉じるボタン */
+
+#eto-story-overlay #eto-story-close {
   align-self: center;
 
   width: 220px;
   min-height: 55px;
 
-  margin-top: 15px;
+  margin-top: 5px;
 
   background:
     linear-gradient(
@@ -2652,382 +2630,178 @@ button {
 
   font-size: 22px;
   font-weight: bold;
+
+  cursor: pointer;
 }
 
-@media (orientation: portrait) {
-  #eto-story-overlay {
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
+/* 無効化されたページ移動ボタン */
 
-    width: 100dvh;
-    height: 100dvw;
-
-    transform:
-      translate(-50%, -50%)
-      rotate(90deg);
-  }
-
-  .eto-story-panel {
-    width: 94%;
-    max-height: 94%;
-  }
+#eto-story-overlay #eto-story-prev:disabled,
+#eto-story-overlay #eto-story-next:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 
 /* ========================================
-   リザルト画面の高さ調整
+   31. CPU担当色選択画面 最終調整
 ======================================== */
 
-/* パネル内の上下余白を縮小 */
+/*
+   CPU担当色選択画面は
+   game-board の内側に表示される。
 
-#result-overlay .result-panel {
-  padding: 10px 12px;
-}
+   元のCSSで使用していた
+   scale(2) を維持する。
+*/
 
-/* タイトル下の余白 */
+#game-board #cpu-color-picker {
+  position: absolute;
 
-#result-overlay .result-panel h2 {
-  margin-bottom: 4px;
-}
+  inset: 0;
 
-/* 勝者表示の上下余白 */
+  width: 100%;
+  height: 100%;
 
-#result-overlay .result-panel h3 {
-  margin: 2px 0 8px;
-}
-
-/* 得点一覧を少しコンパクトに */
-
-#result-overlay .result-row {
-  min-height: 26px;
-  padding: 4px;
-}
-
-/* ボタンの間隔を縮小 */
-
-#result-overlay .result-panel .main-button {
-  min-height: 38px;
-
-  margin-top: 7px;
-  padding: 6px;
-
-  font-size: 14px;
-}
-
-
-
-
-
-
-/* ========================================
-   リザルト関連ボタン
-   深いモスグリーン
-======================================== */
-
-#result-overlay .result-panel .main-button,
-#result-overlay .result-panel .main-button:last-child,
-#return-result-button {
-
-  background: linear-gradient(
-    to bottom,
-    #58765e,
-    #344e3b
-  );
-
-  color: #fff1c9;
-
-  border: 2px solid #91a786;
-
-  box-shadow:
-    0 4px 0 #213529,
-    0 6px 8px rgba(0,0,0,0.3);
-
-  text-shadow: 0 1px 1px #243b30;
-}
-
-#result-overlay .result-panel .main-button:hover,
-#result-overlay .result-panel .main-button:last-child:hover,
-#return-result-button:hover {
-
-  background: linear-gradient(
-    to bottom,
-    #698a70,
-    #42634b
-  );
-}
-
-#result-overlay .result-panel .main-button:active {
-  transform: translateY(3px);
-
-  box-shadow:
-    0 1px 0 #213529,
-    0 2px 4px rgba(0,0,0,0.25);
-}
-
-#return-result-button:active {
-  transform:
-    translate(-50%, -50%)
-    translateY(3px);
-
-  box-shadow:
-    0 1px 0 #213529,
-    0 2px 4px rgba(0,0,0,0.25);
-}
-
-
-/* ========================================
-   右上操作ボタン・並び替えボタン
-   深いモスグリーンに統一
-======================================== */
-
-/* 右上の3つのボタン */
-
-.top-area .top-right > #special-rules-button,
-.top-area .top-right > .speed-control,
-.top-area .top-right > #back-button,
-
-/* 干支順・色順の未選択ボタン */
-
-#sort-zodiac:not(.active),
-#sort-color:not(.active) {
-
-  background:
-    linear-gradient(
-      to bottom,
-      #58765e,
-      #344e3b
-    );
-
-  color: #fff1c9;
-
-  border: 2px solid #91a786;
-
-  box-shadow:
-    0 4px 0 #213529,
-    0 6px 8px rgba(0, 0, 0, 0.3);
-
-  text-shadow: 0 1px 1px #243b30;
-}
-
-/* CPU速度の文字色 */
-
-.top-area .top-right .speed-control label {
-  color: #fff1c9;
-}
-
-/* マウスを乗せたとき */
-
-.top-area .top-right > #special-rules-button:hover,
-.top-area .top-right > .speed-control:hover,
-.top-area .top-right > #back-button:hover,
-#sort-zodiac:not(.active):hover,
-#sort-color:not(.active):hover {
-
-  background:
-    linear-gradient(
-      to bottom,
-      #698a70,
-      #42634b
-    );
-}
-
-/* 押したとき */
-
-.top-area .top-right > #special-rules-button:active,
-.top-area .top-right > .speed-control:active,
-.top-area .top-right > #back-button:active,
-#sort-zodiac:active,
-#sort-color:active {
-
-  transform: translateY(3px);
-
-  box-shadow:
-    0 1px 0 #213529,
-    0 2px 4px rgba(0, 0, 0, 0.25);
-}
-
-
-/* ========================================
-   干支のはなし レイアウト調整
-======================================== */
-
-/* 全体のパネル */
-
-#eto-story-overlay .eto-story-panel {
+  z-index: 30000;
 
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.72);
 
-  overflow: hidden;
-
+  transform: none;
 }
 
-/* 物語の表示領域 */
-
-#eto-story-overlay .eto-story-content {
-
-  flex: 1 1 auto;
-
-  min-height: 0;
-
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  -webkit-overflow-scrolling: touch;
-
-}
-
-/* 物語の見出し */
-
-#eto-story-overlay .eto-story-content > h3:first-child {
-
-  margin-top: 0;
-
-}
-
-/* ========================================
-   下部ボタンエリア
-======================================== */
-
-#eto-story-overlay .eto-story-footer {
-
-  display: flex;
+#game-board .cpu-picker-panel {
+  position: relative;
 
   flex: 0 0 auto;
 
-  justify-content: space-between;
-  align-items: center;
+  transform: scale(2);
+  transform-origin: center center;
 
-  width: 100%;
+  max-width: 500px;
 
-  box-sizing: border-box;
-
-  margin-top: 8px;
-  padding-top: 8px;
-
-  border-top: 1px solid #d6bf8a;
-
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.6);
 }
 
-/* 左側：前へ・次へ */
-
-#eto-story-overlay .eto-story-navigation {
-
-  display: flex;
-
-  align-items: center;
-  justify-content: flex-start;
-
-  gap: 10px;
-
-  margin: 0;
-  padding: 0;
-
-}
-
-/* ========================================
-   ボタン共通
-======================================== */
-
-#eto-story-overlay #eto-story-prev,
-#eto-story-overlay #eto-story-next,
-#eto-story-overlay #eto-story-close {
-
+#game-board .cpu-picker-buttons {
   display: flex;
 
   align-items: center;
   justify-content: center;
 
-  width: 90px;
-  min-width: 0;
-  height: 38px;
-  min-height: 0;
+  flex-wrap: wrap;
 
-  box-sizing: border-box;
-
-  margin: 0;
-  padding: 0 10px;
-
-  background: linear-gradient(
-    to bottom,
-    #58765e,
-    #344e3b
-  );
-
-  color: #fff1c9;
-
-  border: 2px solid #91a786;
-  border-radius: 8px;
-
-  box-shadow: 0 3px 0 #213529;
-
-  font-size: 16px;
-  font-weight: bold;
-
-  cursor: pointer;
-
+  gap: 8px;
 }
 
-/* ページ番号 */
+#game-board .cpu-color-button {
+  min-width: 45px;
+  min-height: 35px;
 
-#eto-story-overlay #eto-story-page {
+  padding: 6px 10px;
 
-  min-width: 50px;
-
-  text-align: center;
-
-  font-size: 15px;
-
-  color: #72502b;
-
+  font-size: 14px;
 }
 
-/* 閉じるボタンを右側へ */
+#game-board .cpu-picker-cancel {
+  min-height: 35px;
 
-#eto-story-overlay #eto-story-close {
+  padding: 6px 18px;
 
-  margin-left: auto;
-
-}
-
-/* 押せない前へボタン */
-
-#eto-story-overlay #eto-story-prev:disabled {
-
-  opacity: 0.4;
-  cursor: default;
-
+  font-size: 13px;
 }
 
 
 /* ========================================
-   十二支の動物一覧
+   32. リザルトから盤面に戻るボタン
+======================================== */
+
+/*
+   JSで game-board の中に
+   動的に作成されるボタン。
+*/
+
+#return-result-button {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  z-index: 9000;
+
+  width: 300px;
+  min-height: 65px;
+
+  padding: 12px 20px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #e6bd6c,
+      #a7762a
+    );
+
+  color: #ffffff;
+
+  border: 3px solid #ffe2a0;
+  border-radius: 12px;
+
+  box-shadow:
+    0 5px 0 #5e3e17,
+    0 8px 20px rgba(0, 0, 0, 0.55);
+
+  font-size: 21px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+#return-result-button:hover {
+  background:
+    linear-gradient(
+      to bottom,
+      #f3d18c,
+      #bc8c3e
+    );
+}
+
+#return-result-button:active {
+  transform:
+    translate(-50%, calc(-50% + 3px));
+
+  box-shadow:
+    0 2px 0 #5e3e17,
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+
+/* ========================================
+   33. 干支のはなし：動物一覧
 ======================================== */
 
 #eto-story-overlay .eto-animal-list {
-
   display: grid;
 
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
 
   gap: 8px;
 
   margin: 12px 0 20px;
-
   padding: 0;
-
 }
 
 /* 動物ごとの枠 */
 
 #eto-story-overlay .eto-animal-list span {
-
   display: flex;
-
   flex-direction: column;
 
   align-items: center;
@@ -3048,53 +2822,219 @@ button {
   line-height: 1.5;
 
   text-align: center;
-
   white-space: normal;
-
 }
 
 /* 干支の名前 */
 
 #eto-story-overlay .eto-animal-list strong {
-
   color: #9b4c17;
 
   font-size: 17px;
-
 }
+
+
 /* ========================================
-   CPU色予想画面 回転対応
+   34. 干支のはなし：操作ボタン配置
 ======================================== */
 
-#game-board {
-  position: relative;
-}
+/*
+   元のCSSにあった
+   横並びの操作配置を復元。
+*/
 
-#game-board #cpu-color-picker {
+#eto-story-overlay .eto-story-footer {
+  flex-direction: row;
 
-  position: absolute;
+  align-items: center;
+  justify-content: space-between;
 
-  inset: 0;
+  gap: 12px;
 
   width: 100%;
-  height: 100%;
+}
 
+#eto-story-overlay .eto-story-navigation {
   display: flex;
 
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 
-  z-index: 9999;
+  flex: 1 1 auto;
 
+  gap: 8px;
+
+  width: auto;
+  min-width: 0;
 }
 
+#eto-story-overlay #eto-story-prev,
+#eto-story-overlay #eto-story-next {
+  min-width: 80px;
+  min-height: 40px;
+
+  padding: 0 10px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #58765e,
+      #344e3b
+    );
+
+  color: #fff1c9;
+
+  border: 2px solid #91a786;
+  border-radius: 8px;
+
+  box-shadow: 0 3px 0 #213529;
+
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#eto-story-overlay #eto-story-page {
+  min-width: 50px;
+
+  color: #72502b;
+
+  font-size: 15px;
+  text-align: center;
+}
+
+#eto-story-overlay #eto-story-close {
+  flex: 0 0 auto;
+
+  width: 150px;
+  min-height: 44px;
+
+  margin: 0 0 0 auto;
+
+  padding: 6px 12px;
+
+  font-size: 18px;
+}
+
+
 /* ========================================
-   CPU担当色予想画面の拡大
+   35. オーバーレイ共通の配置
 ======================================== */
 
-#game-board .cpu-picker-panel {
+/*
+   全画面オーバーレイは
+   #app の1280×720を基準とする。
 
-  transform: scale(2.0);
-  transform-origin: center center;
+   端末の縦横に応じた
+   個別回転は行わない。
+*/
 
+#reveal-overlay,
+#result-overlay,
+#special-rules-overlay,
+#rules-overlay,
+#eto-story-overlay {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
+
+  margin: 0;
+
+  transform: none;
+  transform-origin: top left;
+}
+
+/* モーダルのパネルは個別回転しない */
+
+.reveal-panel,
+.result-panel,
+.special-rules-panel,
+.rules-panel,
+.eto-story-panel {
+  transform: none;
+}
+
+/* スクロール可能な説明部分 */
+
+#reveal-cards,
+#rules-overlay .rules-content,
+#eto-story-overlay .eto-story-content {
+  overscroll-behavior: contain;
+
+  -webkit-overflow-scrolling: touch;
+
+  touch-action: pan-y;
+}
+
+
+/* ========================================
+   36. 画面全体の最終設定
+======================================== */
+
+/*
+   JSの resizeApp() が
+   #app を回転・縮小する。
+
+   CSS側で画面回転は行わない。
+*/
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+}
+
+#app {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
+
+  overflow: hidden;
+
+  transform-origin: top left;
+}
+
+/* トップとゲームは同じ基準サイズ */
+
+#setup-screen,
+#game-screen {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 720px;
+
+  overflow: hidden;
+}
+
+/* ゲーム盤面はJSで個別縮小しない */
+
+#game-board {
+  position: relative;
+
+  width: 1280px;
+  height: 720px;
+
+  transform: none;
+  transform-origin: top left;
+}
+
+/* 非表示の統一 */
+
+.hidden {
+  display: none !important;
 }

@@ -1,403 +1,330 @@
 
 <!DOCTYPE html>
 <html lang="ja">
-<!DOCTYPE html>
-<html lang="ja">
 
 <head>
-
   <meta charset="UTF-8">
 
-  <!-- スマホ表示設定 -->
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0,
-             maximum-scale=1.0, user-scalable=no"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
   >
 
   <title>干支並べ</title>
 
-  <!-- テーマカラー -->
-  <meta
-    name="theme-color"
-    content="#172c24"
-  >
+  <meta name="theme-color" content="#172c24">
 
-  <!-- PWA設定 -->
-  <link
-    rel="manifest"
-    href="manifest.json"
-  >
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="images/icon-192.png">
 
-  <!-- iPhoneホーム画面アイコン -->
-  <link
-    rel="apple-touch-icon"
-    href="images/icon-192.png"
-  >
-
-  <!-- iPhoneホーム画面アプリ対応 -->
-  <meta
-    name="apple-mobile-web-app-capable"
-    content="yes"
-  >
-
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta
     name="apple-mobile-web-app-status-bar-style"
     content="black"
   >
-
   <meta
     name="apple-mobile-web-app-title"
     content="干支並べ"
   >
 
-  <!-- CSS -->
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <div id="app">
-
-    <!-- =====================================
-         対戦設定画面
-    ===================================== -->
-
-
 <!-- =====================================
-     トップ画面
+     全画面共通コンテナ
 ===================================== -->
 
-<section id="setup-screen" class="screen">
-
-  <div class="setup-panel">
-
-    <h1 class="setup-title">干支並べ</h1>
-
-    <h2 class="setup-heading">対戦人数</h2>
-
-    <div class="player-options">
-
-      <button
-        class="player-option"
-        data-players="2"
-        type="button"
-        aria-label="2人対戦"
-      >
-        2人
-      </button>
-
-      <button
-        class="player-option"
-        data-players="3"
-        type="button"
-        aria-label="3人対戦"
-      >
-        3人
-      </button>
-
-      <button
-        class="player-option active"
-        data-players="4"
-        type="button"
-        aria-label="4人対戦"
-      >
-        4人
-      </button>
-
-    </div>
-
-    <p id="setup-description">
-      4人対戦 ／ 手札13枚ずつ
-    </p>
-
-    <button
-      id="start-button"
-      class="main-button"
-      type="button"
-    >
-      ゲーム開始
-    </button>
-
-    <button
-      id="rules-button"
-      class="main-button"
-      type="button"
-    >
-      遊び方説明
-    </button>
-
-    <button
-      id="eto-story-button"
-      class="main-button"
-      type="button"
-    >
-      干支のはなし
-    </button>
-
-  </div>
-
-</section>
-
-
-
-    <!-- =====================================
-         ゲーム画面
-    ===================================== -->
-
-    <section
-      id="game-screen"
-      class="screen hidden"
-    >
-
-      <div id="game-board">
-
-        <!-- =================================
-             上部エリア
-        ================================= -->
-
-<!-- =================================
-     上部エリア
-================================= -->
-
-<header class="top-area">
-
-  <!-- =================================
-       左側：現在の得点
-  ================================= -->
-
-  <div class="top-left">
-
-    <span class="score-heading">
-      現在の得点
-    </span>
-
-    <div id="color-counts">
-
-      <span class="count-red">
-        赤
-        <b id="count-red">0</b>
-      </span>
-
-      <span class="count-blue">
-        青
-        <b id="count-blue">0</b>
-      </span>
-
-      <span class="count-yellow">
-        黄
-        <b id="count-yellow">0</b>
-      </span>
-
-      <span class="count-green">
-        緑
-        <b id="count-green">0</b>
-      </span>
-
-    </div>
-
-  </div>
-
-
-  <!-- =================================
-       中央：CPU2
-  ================================= -->
-
-  <div id="cpu-top"></div>
-
-
-  <!-- =================================
-       右側：操作ボタン
-  ================================= -->
-
-<!-- =================================
-     右上：操作ボタン
-================================= -->
-
-<div class="top-right">
-
-  <!-- 特殊カード説明 -->
-
-  <button
-    id="special-rules-button"
-    class="small-button"
-    type="button"
-  >
-    特殊カード説明
-  </button>
-
-  <!-- CPU速度 -->
-
-  <div class="speed-control">
-
-    <label for="cpu-speed">
-      CPU速度：
-    </label>
-
-    <select id="cpu-speed">
-
-      <option value="fast">
-        高速
-      </option>
-
-      <option value="normal" selected>
-        標準
-      </option>
-
-      <option value="slow">
-        低速
-      </option>
-
-    </select>
-
-  </div>
-
-  <!-- 戻る -->
-
-  <button
-    id="back-button"
-    class="small-button"
-    type="button"
-  >
-    戻る
-  </button>
-
-</div>
-
-</header>
-
-
-        <!-- =================================
-             中央エリア
-        ================================= -->
-
-        <main class="middle-area">
-
-          <!-- 左側CPU -->
-
-          <aside
-            id="cpu-left"
-            class="side-area"
-          ></aside>
-
-
-          <!-- 中央フィールド -->
-
-          <div class="field-area">
-
-            <div id="card-field">
-
-              <!-- 干支12種類 -->
-
-              <div id="zodiac-field"></div>
-
-              <!-- 猫カードの山 -->
-
-              <div id="cat-cards"></div>
-
-            </div>
-
-
-            <!-- メッセージ -->
-
-            <div class="field-footer">
-
-              <div id="game-message">
-                対戦画面の確認中
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <!-- 右側CPU -->
-
-          <aside
-            id="cpu-right"
-            class="side-area"
-          ></aside>
-
-        </main>
-
-
-        <!-- =================================
-             下部：自分の手札
-        ================================= -->
-
-        <footer class="bottom-area">
-
-          <!-- プレイヤー情報 -->
-
-          <div class="hand-header">
-
-            <div id="my-info"></div>
-
-
-            <!-- 並び替え -->
-
-            <div class="hand-controls">
-
-              <button
-                id="sort-zodiac"
-                class="sort-button active"
-                type="button"
-              >
-                干支順
-              </button>
-
-              <button
-                id="sort-color"
-                class="sort-button"
-                type="button"
-              >
-                色順
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <!-- 手札と操作ボタン -->
-
-          <div class="hand-main">
-
-            <div id="my-hand"></div>
-
-
-            <div class="action-buttons">
-
-              <button
-                id="play-button"
-                class="action-button"
-                type="button"
-              >
-                場に出す
-              </button>
-
-              <button
-                id="pass-button"
-                class="action-button secondary"
-                type="button"
-              >
-                カードを渡す
-              </button>
-
-            </div>
-
-          </div>
-
-        </footer>
+<div id="app">
+
+  <!-- =====================================
+       トップ画面
+  ===================================== -->
+
+  <section id="setup-screen" class="screen">
+
+    <div class="setup-panel">
+
+      <h1 class="setup-title">干支並べ</h1>
+
+      <h2 class="setup-heading">対戦人数</h2>
+
+      <div class="player-options">
+
+        <button
+          class="player-option"
+          data-players="2"
+          type="button"
+          aria-label="2人対戦"
+        >
+          2人
+        </button>
+
+        <button
+          class="player-option"
+          data-players="3"
+          type="button"
+          aria-label="3人対戦"
+        >
+          3人
+        </button>
+
+        <button
+          class="player-option active"
+          data-players="4"
+          type="button"
+          aria-label="4人対戦"
+        >
+          4人
+        </button>
 
       </div>
 
-    </section>
+      <p id="setup-description">
+        4人対戦 ／ 手札13枚ずつ
+      </p>
 
-  </div>
+      <button
+        id="start-button"
+        class="main-button"
+        type="button"
+      >
+        ゲーム開始
+      </button>
+
+      <button
+        id="rules-button"
+        class="main-button"
+        type="button"
+      >
+        遊び方説明
+      </button>
+
+      <button
+        id="eto-story-button"
+        class="main-button"
+        type="button"
+      >
+        干支のはなし
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================
+       ゲーム画面
+  ===================================== -->
+
+  <section
+    id="game-screen"
+    class="screen hidden"
+  >
+
+    <div id="game-board">
+
+      <!-- 上部エリア -->
+
+      <header class="top-area">
+
+        <!-- 現在の得点 -->
+
+        <div class="top-left">
+
+          <span class="score-heading">
+            現在の得点
+          </span>
+
+          <div id="color-counts">
+
+            <span class="count-red">
+              赤
+              <b id="count-red">0</b>
+            </span>
+
+            <span class="count-blue">
+              青
+              <b id="count-blue">0</b>
+            </span>
+
+            <span class="count-yellow">
+              黄
+              <b id="count-yellow">0</b>
+            </span>
+
+            <span class="count-green">
+              緑
+              <b id="count-green">0</b>
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- 上側CPU -->
+
+        <div id="cpu-top"></div>
+
+        <!-- 操作メニュー -->
+
+        <div class="top-right">
+
+          <button
+            id="special-rules-button"
+            class="small-button"
+            type="button"
+          >
+            特殊カード説明
+          </button>
+
+          <div class="speed-control">
+
+            <label for="cpu-speed">
+              CPU速度：
+            </label>
+
+            <select id="cpu-speed">
+
+              <option value="fast">
+                高速
+              </option>
+
+              <option value="normal" selected>
+                標準
+              </option>
+
+              <option value="slow">
+                低速
+              </option>
+
+            </select>
+
+          </div>
+
+          <button
+            id="back-button"
+            class="small-button"
+            type="button"
+          >
+            戻る
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <!-- =================================
+           中央エリア
+      ================================= -->
+
+      <main class="middle-area">
+
+        <!-- 左側CPU -->
+
+        <aside
+          id="cpu-left"
+          class="side-area"
+        ></aside>
+
+        <!-- 中央フィールド -->
+
+        <div class="field-area">
+
+          <div id="card-field">
+
+            <div id="zodiac-field"></div>
+
+            <div id="cat-cards"></div>
+
+          </div>
+
+          <div class="field-footer">
+
+            <div id="game-message">
+              対戦画面の確認中
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- 右側CPU -->
+
+        <aside
+          id="cpu-right"
+          class="side-area"
+        ></aside>
+
+      </main>
+
+
+      <!-- =================================
+           下部：プレイヤーの手札
+      ================================= -->
+
+      <footer class="bottom-area">
+
+        <div class="hand-header">
+
+          <div id="my-info"></div>
+
+          <div class="hand-controls">
+
+            <button
+              id="sort-zodiac"
+              class="sort-button active"
+              type="button"
+            >
+              干支順
+            </button>
+
+            <button
+              id="sort-color"
+              class="sort-button"
+              type="button"
+            >
+              色順
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="hand-main">
+
+          <div id="my-hand"></div>
+
+          <div class="action-buttons">
+
+            <button
+              id="play-button"
+              class="action-button"
+              type="button"
+            >
+              場に出す
+            </button>
+
+            <button
+              id="pass-button"
+              class="action-button secondary"
+              type="button"
+            >
+              カードを渡す
+            </button>
+
+          </div>
+
+        </div>
+
+      </footer>
+
+    </div>
+
+  </section>
 
 
   <!-- =====================================
@@ -433,7 +360,7 @@
 
 
   <!-- =====================================
-       特殊カード説明画面
+       特殊カード説明
   ===================================== -->
 
   <div
@@ -451,120 +378,85 @@
 
         <div class="special-rule-item">
 
-          <img
-            src="images/赤1.png"
-            alt="子"
-          >
+          <img src="images/赤1.png" alt="子">
 
           <div>
-
             <h3>子（ね）</h3>
-
             <p>
               丑（うし）のカードが場に出ていない場合、
               このカードは出せません。
             </p>
-
           </div>
 
         </div>
-
 
         <!-- 巳 -->
 
         <div class="special-rule-item">
 
-          <img
-            src="images/赤6.png"
-            alt="巳"
-          >
+          <img src="images/赤6.png" alt="巳">
 
           <div>
-
             <h3>巳（み）</h3>
-
             <p>
               場にある巳（み）の枚数が、
               辰（たつ）の枚数を超えるようには
               出せません。
             </p>
-
           </div>
 
         </div>
-
 
         <!-- 申 -->
 
         <div class="special-rule-item">
 
-          <img
-            src="images/赤9.png"
-            alt="申"
-          >
+          <img src="images/赤9.png" alt="申">
 
           <div>
-
             <h3>申（さる）</h3>
-
             <p>
               場に出したとき、2枚以上の戌（いぬ）が場にあれば、
               一番上の戌（いぬ）を一番下に移動します。
             </p>
-
           </div>
 
         </div>
-
 
         <!-- 戌 -->
 
         <div class="special-rule-item">
 
-          <img
-            src="images/赤11.png"
-            alt="戌"
-          >
+          <img src="images/赤11.png" alt="戌">
 
           <div>
-
             <h3>戌（いぬ）</h3>
-
             <p>
               場に出したとき、2枚以上の申（さる）が場にあれば、
               一番上の申（さる）を一番下に移動します。
             </p>
-
           </div>
 
         </div>
-
 
         <!-- 猫 -->
 
         <div class="special-rule-item">
 
-          <img
-            src="images/黒13.png"
-            alt="猫"
-          >
+          <img src="images/黒13.png" alt="猫">
 
           <div>
-
             <h3>猫（ねこ）</h3>
-
             <p>
               場に出したとき、
               全員が手札の子（ね）を公開し、
               すべての子（ね）を逆方向（半時計回り）に渡します。
             </p>
-
           </div>
 
         </div>
 
       </div>
-
 
       <button
         id="special-rules-close"
@@ -580,7 +472,7 @@
 
 
   <!-- =====================================
-       新規追加：遊び方・ルール説明画面
+       遊び方・ルール説明
   ===================================== -->
 
   <div
@@ -593,8 +485,6 @@
       <h2>干支並べの遊び方</h2>
 
       <div class="rules-content">
-
-        <!-- ゲームの目的 -->
 
         <section>
 
@@ -612,9 +502,6 @@
 
         </section>
 
-
-        <!-- ゲームの準備 -->
-
         <section>
 
           <h3>ゲームの準備</h3>
@@ -631,21 +518,21 @@
           </p>
 
           <p>
-            赤の亥（い）が配られたプレイヤーからゲームをスタートします。
-        </p>
-        <p>
+            赤の亥（い）が配られたプレイヤーから
+            ゲームをスタートします。
+          </p>
+
+          <p>
             最初に出せるカードは赤の亥（い）のみです。
           </p>
 
           <p>
             自分の色は確認できますが、
-            他のプレイヤーの色はゲーム終了まで公開されません。
+            他のプレイヤーの色は
+            ゲーム終了まで公開されません。
           </p>
 
         </section>
-
-
-        <!-- ターンの進め方 -->
 
         <section>
 
@@ -654,9 +541,11 @@
           <p>
             ① 手札から出せるカードを1枚選び、
             対応する干支の場所に置きます。
-            </p>
-            <p>
-            すでに同じ干支のカードが置かれているなら上に重ねて置きます。
+          </p>
+
+          <p>
+            すでに同じ干支のカードが置かれているなら
+            上に重ねて置きます。
           </p>
 
           <p>
@@ -676,72 +565,68 @@
 
         </section>
 
+        <section class="rule-special-section">
 
-<!-- 特殊カード -->
+          <h3>特殊なカード</h3>
 
-<section class="rule-special-section">
+          <div class="rule-special-item">
 
-  <h3>特殊なカード</h3>
+            <strong>子（ね）</strong>
 
-  <div class="rule-special-item">
+            <p>
+              丑（うし）のカードが場にないと出せません。
+            </p>
 
-    <strong>子（ね）</strong>
+          </div>
 
-    <p>
-      丑（うし）のカードが場にないと出せません。
-    </p>
+          <div class="rule-special-item">
 
-  </div>
+            <strong>巳（み）</strong>
 
-  <div class="rule-special-item">
+            <p>
+              巳（み）の枚数が辰（たつ）の枚数を
+              超えるようには出せません。
+            </p>
 
-    <strong>巳（み）</strong>
+          </div>
 
-    <p>
-      巳（み）の枚数が辰（たつ）の枚数を超えるようには
-      出せません。
-    </p>
+          <div class="rule-special-item">
 
-  </div>
+            <strong>申（さる）</strong>
 
-  <div class="rule-special-item">
+            <p>
+              場に出したとき、2枚以上の戌（いぬ）が
+              場にあれば、一番上の戌（いぬ）を
+              一番下に移動します。
+            </p>
 
-    <strong>申（さる）</strong>
+          </div>
 
-    <p>
-      場に出したとき、2枚以上の戌（いぬ）が場にあれば、
-      一番上の戌（いぬ）を一番下に移動します。
-    </p>
+          <div class="rule-special-item">
 
-  </div>
+            <strong>戌（いぬ）</strong>
 
-  <div class="rule-special-item">
+            <p>
+              場に出したとき、2枚以上の申（さる）が
+              場にあれば、一番上の申（さる）を
+              一番下に移動します。
+            </p>
 
-    <strong>戌（いぬ）</strong>
+          </div>
 
-    <p>
-      場に出したとき、2枚以上の申（さる）が場にあれば、
-      一番上の申（さる）を一番下に移動します。
-    </p>
+          <div class="rule-special-item">
 
-  </div>
+            <strong>猫（ねこ）</strong>
 
-  <div class="rule-special-item">
+            <p>
+              場に出したとき、
+              全員が手札の子（ね）を公開し、
+              すべての子（ね）を逆方向（半時計回り）に渡します。
+            </p>
 
-    <strong>猫（ねこ）</strong>
+          </div>
 
-    <p>
-      場に出したとき、
-      全員が手札の子（ね）を公開し、
-      すべての子（ね）を逆方向（半時計回り）に渡します。
-    </p>
-
-  </div>
-
-</section>
-
-
-        <!-- 脱落 -->
+        </section>
 
         <section>
 
@@ -754,18 +639,14 @@
 
           <p>
             （脱落しても敗北するわけではありません。）
-          </p>          
+          </p>
 
           <p>
             脱落したプレイヤーは、
             以後のカードの受け渡しに参加しません。
           </p>
 
-
         </section>
-
-
-        <!-- ゲーム終了 -->
 
         <section>
 
@@ -786,9 +667,6 @@
           </p>
 
         </section>
-
-
-        <!-- 得点と勝敗 -->
 
         <section>
 
@@ -811,100 +689,99 @@
           <p>
             同点の場合は、
             子・丑・寅・卯・辰・巳・午・未・申・酉・戌・亥
-            の順番で干支の色を確認し、先に自分の色の干支があったプレイヤーが勝利です。
+            の順番で干支の色を確認し、
+            先に自分の色の干支があった
+            プレイヤーが勝利です。
           </p>
 
         </section>
 
       </div>
 
+      <div class="rules-footer">
 
-      <!-- 閉じるボタン -->
+        <div class="rules-scroll-hint">
+          <span class="rules-scroll-arrow">▼</span>
+          下にスクロールして続きを読む
+        </div>
 
-
-<div class="rules-footer">
-
-  <div class="rules-scroll-hint">
-    <span class="rules-scroll-arrow">▼</span>
-    下にスクロールして続きを読む
-  </div>
-
-  <button
-    id="rules-close"
-    class="main-button"
-    type="button"
-  >
-    閉じる
-  </button>
-
-</div>
-
-
-    </div>
-
-  </div>
-
-  
-
-<!-- =====================================
-     干支のはなし
-===================================== -->
-
-
-<!-- =====================================
-     干支のはなし
-===================================== -->
-
-<div id="eto-story-overlay" class="hidden">
-
-  <div class="eto-story-panel">
-
-    <!-- 物語の表示領域 -->
-    <div
-      class="eto-story-content"
-      id="eto-story-content"
-    ></div>
-
-    <!-- 下部操作エリア -->
-    <div class="eto-story-footer">
-
-      <!-- 左側：ページ切り替え -->
-      <div class="eto-story-navigation">
-
-        <button id="eto-story-prev" type="button">
-          前へ
-        </button>
-
-        <span id="eto-story-page">
-          1 / 7
-        </span>
-
-        <button id="eto-story-next" type="button">
-          次へ
+        <button
+          id="rules-close"
+          class="main-button"
+          type="button"
+        >
+          閉じる
         </button>
 
       </div>
 
-      <!-- 右側：閉じる -->
-      <button id="eto-story-close" type="button">
-        閉じる
-      </button>
+    </div>
+
+  </div>
+
+
+  <!-- =====================================
+       干支のはなし
+  ===================================== -->
+
+  <div
+    id="eto-story-overlay"
+    class="hidden"
+  >
+
+    <div class="eto-story-panel">
+
+      <div
+        class="eto-story-content"
+        id="eto-story-content"
+      ></div>
+
+      <div class="eto-story-footer">
+
+        <div class="eto-story-navigation">
+
+          <button
+            id="eto-story-prev"
+            type="button"
+          >
+            前へ
+          </button>
+
+          <span id="eto-story-page">
+            1 / 7
+          </span>
+
+          <button
+            id="eto-story-next"
+            type="button"
+          >
+            次へ
+          </button>
+
+        </div>
+
+        <button
+          id="eto-story-close"
+          type="button"
+        >
+          閉じる
+        </button>
+
+      </div>
 
     </div>
 
   </div>
 
 </div>
+<!-- #app 終了 -->
 
 
+<!-- =====================================
+     JavaScript
+===================================== -->
 
-
-  <!-- =====================================
-       JavaScript
-  ===================================== -->
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
-
