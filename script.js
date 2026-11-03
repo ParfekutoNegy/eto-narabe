@@ -2854,15 +2854,16 @@ function resizeGame() {
 
   if (!game) return;
 
-const viewport = window.visualViewport;
+// =====================================
+// 画面サイズ取得
+// CSSの配置基準と統一
+// =====================================
 
-const width = viewport
-  ? viewport.width
-  : window.innerWidth;
+const width = document.documentElement.clientWidth
+  || window.innerWidth;
 
-const height = viewport
-  ? viewport.height
-  : window.innerHeight;
+const height = document.documentElement.clientHeight
+  || window.innerHeight;
 
   if (width <= 0 || height <= 0) return;
 
@@ -3506,15 +3507,16 @@ function resizeSetup() {
 
   if (!panel) return;
 
-const viewport = window.visualViewport;
+// =====================================
+// 画面サイズ取得
+// CSSの配置基準と統一
+// =====================================
 
-const width = viewport
-  ? viewport.width
-  : window.innerWidth;
+const width = document.documentElement.clientWidth
+  || window.innerWidth;
 
-const height = viewport
-  ? viewport.height
-  : window.innerHeight;
+const height = document.documentElement.clientHeight
+  || window.innerHeight;
 
   if (width <= 0 || height <= 0) return;
 
