@@ -3884,3 +3884,46 @@ if ("serviceWorker" in navigator) {
   );
 
 })();
+
+/* =====================================
+   タッチ位置とボタン位置の比較
+===================================== */
+
+document.addEventListener("touchstart", event => {
+
+  const touch = event.touches[0];
+  if (!touch) return;
+
+  const button = document.getElementById("play-button");
+  if (!button) return;
+
+  const rect = button.getBoundingClientRect();
+
+  const x = touch.clientX;
+  const y = touch.clientY;
+
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const actual = document.elementFromPoint(x, y);
+  const center = document.elementFromPoint(centerX, centerY);
+
+  console.log("タッチ座標", x, y);
+  console.log("ボタン中心", centerX, centerY);
+  console.log("タッチ先", actual);
+  console.log("ボタン中心の判定", center);
+
+  alert(
+    "タッチ座標：" +
+    Math.round(x) + "," + Math.round(y) +
+    "\nボタン中心：" +
+    Math.round(centerX) + "," + Math.round(centerY) +
+    "\n中心の判定：" +
+    (center?.id || center?.className || "なし")
+  );
+
+}, {
+  once: true,
+  capture: true,
+  passive: true
+});
