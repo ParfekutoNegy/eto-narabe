@@ -3833,133 +3833,74 @@ if ("serviceWorker" in navigator) {
 }
 
 /* =====================================
-   タッチ位置の診断（一時的）
+   タッチ診断・最新版
 ===================================== */
 
 (function () {
 
   const debug = document.createElement("div");
 
+  debug.id = "touch-debug";
+
   debug.style.cssText = `
     position: fixed;
-    top: 8px;
     left: 8px;
+    top: 8px;
     z-index: 999999;
-    background: rgba(0, 0, 0, 0.9);
-    color: #ffffff;
-    padding: 8px;
-    font-size: 12px;
-    line-height: 1.5;
-    pointer-events: none;
+    padding: 10px;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    font-size: 14px;
     white-space: pre-line;
-    max-width: 90vw;
+    pointer-events: none;
   `;
 
   document.body.appendChild(debug);
 
-  document.addEventListener(
-    "touchstart",
-    event => {
+  let count = 0;
 
-      const touch = event.touches[0];
+  document.addEventListener("touchstart", event => {
 
-      if (!touch) return;
+    const gameScreen =
+      document.getElementById("game-screen");
 
-      const x = touch.clientX;
-      const y = touch.clientY;
+    if (
+      !gameScreen ||
+      gameScreen.classList.contains("hidden")
+    ) {
+      return;
+    }
 
-      const target =
-        document.elementFromPoint(x, y);
+    const touch = event.touches[0];
+    if (!touch) return;
 
-      const button =
-        target?.closest("button");
+    count++;
 
-      debug.textContent =
-        `タッチ位置：${Math.round(x)}, ${Math.round(y)}\n` +
-        `判定要素：${target?.id || target?.className || target?.tagName}\n` +
-        `ボタン：${button?.textContent.trim() || "なし"}`;
+    const x = touch.clientX;
+    const y = touch.clientY;
 
-    },
-    { capture: true, passive: true }
-  );
+    const target = document.elementFromPoint(x, y);
+
+    const button =
+      document.getElementById("play-button");
+
+    const rect = button?.getBoundingClientRect();
+
+    debug.textContent =
+      `診断回数：${count}\n` +
+      `タッチ：${Math.round(x)}, ${Math.round(y)}\n` +
+      `判定：${target?.id || target?.className || "なし"}\n` +
+      `ボタン中心：${
+        rect
+          ? Math.round(rect.left + rect.width / 2) +
+            ", " +
+            Math.round(rect.top + rect.height / 2)
+          : "なし"
+      }`;
+
+  }, {
+    capture: true,
+    passive: true
+  });
 
 })();
-
-/* =====================================
-   タッチ位置とボタン位置の比較
-   ゲーム画面だけで診断
-===================================== */
-
-document.addEventListener("touchstart", event => {
-
-  const gameScreen =
-    document.getElementById("game-screen");
-
-  if (
-    !gameScreen ||
-    gameScreen.classList.contains("hidden")
-  ) {
-    return;
-  }
-
-  const touch = event.touches[0];
-  if (!touch) return;
-
-  const button =
-    document.getElementById("play-button");
-
-  if (!button) return;
-
-  const rect = button.getBoundingClientRect();
-
-  const x = touch.clientX;
-  const y = touch.clientY;
-
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
-
-  const target = document.elementFromPoint(
-    centerX,
-    centerY
-  );
-
-  const result =
-    "タッチ座標：" +
-    Math.round(x) + "," + Math.round(y) +
-    "\nボタン中心：" +
-    Math.round(centerX) + "," +
-    Math.round(centerY) +
-    "\n中心の判定：" +
-    (target?.id || target?.className || "なし");
-
-  // 画面に結果を表示
-  let debug =
-    document.getElementById("touch-debug-result");
-
-  if (!debug) {
-
-    debug = document.createElement("div");
-    debug.id = "touch-debug-result";
-
-    debug.style.cssText = `
-      position: fixed;
-      top: 8px;
-      left: 8px;
-      z-index: 999999;
-      background: rgba(0,0,0,0.9);
-      color: white;
-      padding: 10px;
-      font-size: 13px;
-      white-space: pre-line;
-      pointer-events: none;
-    `;
-
-    document.body.appendChild(debug);
-  }
-
-  debug.textContent = result;
-
-}, {
-  capture: true,
-  passive: true
-});
