@@ -36,6 +36,479 @@ let handSort = "zodiac";
 let cpuSpeed = "normal";
 let cpuColorPredictions = {};
 
+
+/* ========================================
+   CPU担当色推理システム（上級）
+======================================== */
+
+// CPUごとの担当色推理データ
+let cpuColorBeliefs = {};
+
+// 推理の初期評価点
+const CPU_COLOR_BASE_SCORE = 100;
+
+// 推理に使う色
+function getCpuInferenceColors() {
+
+  return playerCount === 2
+    ? COLORS.slice(0, 3)
+    : COLORS.slice();
+
+}
+
+
+// ========================================
+// CPU推理データの初期化
+// ========================================
+
+function initializeCpuColorBeliefs() {
+
+  cpuColorBeliefs = {};
+
+  const colors = getCpuInferenceColors();
+
+  // CPUごとに別々の推理データを作成
+  players.forEach(cpu => {
+
+    if (cpu.id === 0) {
+      return;
+    }
+
+    cpuColorBeliefs[cpu.id] = {};
+
+    players.forEach(target => {
+
+      // 自分自身は推理しない
+      if (target.id === cpu.id) {
+        return;
+      }
+
+      const scores = {};
+
+      colors.forEach(color => {
+
+        // 自分の担当色は他人に割り当てられない
+        scores[color] =
+          color === cpu.color
+            ? 0
+            : CPU_COLOR_BASE_SCORE;
+
+      });
+
+      cpuColorBeliefs[cpu.id][target.id] = {
+        scores: scores,
+        observations: 0
+      };
+
+    });
+
+  });
+
+}
+
+
+/* ========================================
+   CPU担当色推理：場に出したカードを観察
+======================================== */
+
+function observeCpuPlayedCard(
+  player,
+  card,
+  previousPile
+) {
+
+  // 猫は担当色の推理に使わない
+  if (card.zodiac === "猫") {
+    return;
+  }
+
+  const previousCount = previousPile.length;
+
+  const previousTop =
+    previousCount > 0
+      ? previousPile[previousCount - 1]
+      : null;
+
+  // 出された色の評価
+  let colorBonus = 5;
+
+  // 別の色を上書きした場合
+  if (
+    previousTop &&
+    previousTop.color !== card.color
+  ) {
+    colorBonus += 15;
+  }
+
+  // 同じ干支の山の3枚目
+  if (previousCount === 2) {
+    colorBonus += 20;
+  }
+
+  // 同じ干支の山の4枚目
+  if (previousCount === 3) {
+    colorBonus += 100;
+  }
+
+  // 各CPUがそれぞれ独立して観察する
+  players.forEach(cpu => {
+
+    if (cpu.id === 0) {
+      return;
+    }
+
+    // 自分の行動は相手の推理に使わない
+    if (cpu.id === player.id) {
+      return;
+    }
+
+    const belief =
+      cpuColorBeliefs[cpu.id]?.[player.id];
+
+    if (!belief) {
+      return;
+    }
+
+    // CPU自身の担当色は候補から除外
+    if (card.color !== cpu.color) {
+
+      belief.scores[card.color] +=
+        colorBonus;
+
+    }
+
+    // 以前の山の一番上が別の色だった場合
+    if (
+      previousTop &&
+      previousTop.color !== card.color &&
+      previousTop.color !== cpu.color
+    ) {
+
+      belief.scores[previousTop.color] =
+        Math.max(
+          1,
+          belief.scores[previousTop.color] - 30
+        );
+
+    }
+
+    belief.observations++;
+
+  });
+
+}
+
+
+// ========================================
+// CPUから見た担当色の予想を取得
+// ========================================
+
+function getCpuPredictedColor(
+  cpuId,
+  targetId
+) {
+
+  const belief =
+    cpuColorBeliefs[cpuId]?.[targetId];
+
+  if (!belief) {
+    return null;
+  }
+
+  const colors = getCpuInferenceColors();
+
+  const candidates = colors
+    .filter(color => belief.scores[color] > 0)
+    .map(color => ({
+      color,
+      score: belief.scores[color]
+    }));
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  candidates.sort(
+    (a, b) => b.score - a.score
+  );
+
+  return candidates[0].color;
+
+}
+
+
+/* ========================================
+   CPU担当色の推理確率
+======================================== */
+
+
+/* ========================================
+   CPU担当色推理（上級）
+   全員の担当色の組み合わせを考慮
+======================================== */
+
+function getCpuColorProbabilities(
+  cpuId,
+  targetId
+) {
+
+  const cpu = players.find(
+    player => player.id === cpuId
+  );
+
+  if (!cpu || cpuId === targetId) {
+    return {};
+  }
+
+  const beliefs = cpuColorBeliefs[cpuId];
+
+  if (!beliefs || !beliefs[targetId]) {
+    return {};
+  }
+
+  const colors = getCpuInferenceColors();
+
+  // 自分の担当色は他人に割り当てない
+  const availableColors = colors.filter(
+    color => color !== cpu.color
+  );
+
+  const targets = players.filter(
+    player => player.id !== cpuId
+  );
+
+  // =====================================
+  // 観察情報を確率計算用の重みに変換
+  // =====================================
+
+  const weights = {};
+
+  targets.forEach(target => {
+
+    const belief = beliefs[target.id];
+
+    const scores = belief.scores;
+
+    const observations =
+      belief.observations || 0;
+
+    // 観察が少ない間は推理を弱める
+    const confidence = Math.min(
+      1,
+      observations / 6
+    );
+
+    // 上級CPUの推理感度
+    const sensitivity =
+      0.35 + confidence * 0.65;
+
+    const maxScore = Math.max(
+      ...availableColors.map(
+        color => scores[color] || 0
+      )
+    );
+
+    weights[target.id] = {};
+
+    availableColors.forEach(color => {
+
+      const score =
+        scores[color] || 0;
+
+      // 指数変換で評価差を反映
+      // 最大評価を基準にして数値を安定化
+      const exponent =
+        ((score - maxScore) / 55) *
+        sensitivity;
+
+      weights[target.id][color] =
+        Math.exp(exponent);
+
+    });
+
+  });
+
+  // =====================================
+  // 担当色の全組み合わせを評価
+  // =====================================
+
+  const totals = {};
+
+  targets.forEach(target => {
+
+    totals[target.id] = {};
+
+    availableColors.forEach(color => {
+      totals[target.id][color] = 0;
+    });
+
+  });
+
+  let totalWeight = 0;
+
+  function exploreAssignments(
+    index,
+    usedColors,
+    assignment,
+    weight
+  ) {
+
+    if (index >= targets.length) {
+
+      totalWeight += weight;
+
+      targets.forEach(target => {
+
+        const color = assignment[target.id];
+
+        totals[target.id][color] +=
+          weight;
+
+      });
+
+      return;
+    }
+
+    const target = targets[index];
+
+    availableColors.forEach(color => {
+
+      // 同じ色は2人に割り当てない
+      if (usedColors.has(color)) {
+        return;
+      }
+
+      const nextWeight =
+        weight *
+        weights[target.id][color];
+
+      usedColors.add(color);
+
+      assignment[target.id] = color;
+
+      exploreAssignments(
+        index + 1,
+        usedColors,
+        assignment,
+        nextWeight
+      );
+
+      usedColors.delete(color);
+
+      delete assignment[target.id];
+
+    });
+
+  }
+
+  exploreAssignments(
+    0,
+    new Set(),
+    {},
+    1
+  );
+
+  // =====================================
+  // 対象プレイヤーの推理確率を返す
+  // =====================================
+
+  const probabilities = {};
+
+  colors.forEach(color => {
+
+    probabilities[color] = 0;
+
+  });
+
+  if (totalWeight > 0) {
+
+    availableColors.forEach(color => {
+
+      probabilities[color] =
+        totals[targetId][color] /
+        totalWeight;
+
+    });
+
+  }
+
+  return probabilities;
+
+}
+
+
+
+// ========================================
+// 相手の予想得点を計算
+// ========================================
+
+function getCpuExpectedOpponentScore(
+  cpu,
+  opponent,
+  scores
+) {
+
+  const probabilities =
+    getCpuColorProbabilities(
+      cpu.id,
+      opponent.id
+    );
+
+  let expectedScore = 0;
+
+  getCpuInferenceColors().forEach(color => {
+
+    expectedScore +=
+      (scores[color] || 0) *
+      (probabilities[color] || 0);
+
+  });
+
+  return expectedScore;
+}
+
+
+// ========================================
+// ゲーム終了時の勝敗を推定
+// ========================================
+
+function evaluateCpuEnding(
+  cpu,
+  targetField
+) {
+
+  const scores = getFieldScores(targetField);
+
+  const myScore = scores[cpu.color];
+
+  let opponentBest = 0;
+
+  players.forEach(opponent => {
+
+    if (opponent.id === cpu.id) {
+      return;
+    }
+
+    const expectedScore =
+      getCpuExpectedOpponentScore(
+        cpu,
+        opponent,
+        scores
+      );
+
+    opponentBest = Math.max(
+      opponentBest,
+      expectedScore
+    );
+
+  });
+
+  return myScore - opponentBest;
+}
+
+
+
+
 /* =====================================
    新しく受け取ったカードの強調表示
 ===================================== */
@@ -305,6 +778,8 @@ if (greenScore) {
       eliminated: false
     })
   );
+
+    initializeCpuColorBeliefs();
 
   let deck = [];
 
@@ -1247,6 +1722,7 @@ function getPredictedWinner(targetField) {
 // ========================================
 
 
+
 function evaluateCpuCard(player, card) {
 
   const currentScores = getFieldScores();
@@ -1258,6 +1734,7 @@ function evaluateCpuCard(player, card) {
   const myColor = player.color;
 
   let points = 0;
+
 
   // =====================================
   // 1. 自分の得点変化
@@ -1271,7 +1748,7 @@ function evaluateCpuCard(player, card) {
 
 
   // =====================================
-  // 2. 相手の得点変化
+  // 2. 相手の予想得点変化
   // =====================================
 
   players.forEach(opponent => {
@@ -1280,14 +1757,28 @@ function evaluateCpuCard(player, card) {
       return;
     }
 
-    const color = opponent.color;
+    const probabilities =
+      getCpuColorProbabilities(
+        player.id,
+        opponent.id
+      );
 
-    const gain =
-      nextScores[color] -
-      currentScores[color];
+    let expectedGain = 0;
 
-    // 相手の得点が増える行動は避ける
-    points -= gain * 65;
+    getCpuInferenceColors().forEach(color => {
+
+      const gain =
+        nextScores[color] -
+        currentScores[color];
+
+      expectedGain +=
+        gain *
+        (probabilities[color] || 0);
+
+    });
+
+    points -= expectedGain * 65;
+
   });
 
 
@@ -1325,11 +1816,14 @@ function evaluateCpuCard(player, card) {
       ) {
         points -= 100;
       }
+
     }
+
   }
 
+
   // =====================================
-  // 自分の色を山の一番下に置くリスク
+  // 5. 自分の色を最初に置くリスク
   // =====================================
 
   if (
@@ -1338,31 +1832,39 @@ function evaluateCpuCard(player, card) {
     field[card.zodiac].length === 0
   ) {
 
-    // 現在、場にある干支の種類数
     const zodiacCount = ZODIACS.filter(
       zodiac => field[zodiac].length > 0
     ).length;
 
-    // 序盤ほど上書きされるリスクを高く評価
+    let avoidProbability = 0;
+    let avoidPenalty = 0;
+
     if (zodiacCount <= 3) {
 
-      points -= 60;
+      avoidProbability = 0.65;
+      avoidPenalty = 60;
 
     } else if (zodiacCount <= 7) {
 
-      points -= 20;
+      avoidProbability = 0.40;
+      avoidPenalty = 20;
 
     } else {
 
-      points -= 10;
+      avoidProbability = 0.20;
+      avoidPenalty = 10;
 
+    }
+
+    if (Math.random() < avoidProbability) {
+      points -= avoidPenalty;
     }
 
   }
 
 
   // =====================================
-  // 5. 新しい干支を出す判断
+  // 6. 新しい干支を出す判断
   // =====================================
 
   if (
@@ -1374,48 +1876,68 @@ function evaluateCpuCard(player, card) {
 
     const myScore = currentScores[myColor];
 
-    const opponentBest = Math.max(
-      ...players
-        .filter(p => p.id !== player.id)
-        .map(p => currentScores[p.color])
-    );
+    let opponentBest = 0;
 
-    // 自分が勝っているときは終了を促進
+    players.forEach(opponent => {
+
+      if (opponent.id === player.id) {
+        return;
+      }
+
+      const expectedScore =
+        getCpuExpectedOpponentScore(
+          player,
+          opponent,
+          currentScores
+        );
+
+      opponentBest = Math.max(
+        opponentBest,
+        expectedScore
+      );
+
+    });
+
     if (myScore > opponentBest) {
       points += 20;
     }
 
-    // 負けているときは終了を遅らせる
     if (myScore < opponentBest) {
       points -= 15;
     }
+
   }
 
 
   // =====================================
-  // 6. この一手で12種類完成する場合
+  // 7. ゲーム終了時の勝敗予測
   // =====================================
 
   if (isFieldComplete(nextField)) {
 
-    const predictedWinner =
-      getPredictedWinner(nextField);
+    const scoreDifference =
+      evaluateCpuEnding(
+        player,
+        nextField
+      );
 
-    if (predictedWinner.id === player.id) {
+    if (scoreDifference > 0) {
 
-      // 自分の勝利が確定
-      points += 10000;
+      points +=
+        5000 + scoreDifference * 100;
 
     } else {
 
-      // 相手が勝つなら極力避ける
-      points -= 10000;
+      points -=
+        5000 + Math.abs(scoreDifference) * 100;
+
     }
+
   }
 
 
   // =====================================
-  // 7. 猫のカード
+  // 8. 猫カード
   // =====================================
 
   if (card.zodiac === "猫") {
@@ -1426,18 +1948,19 @@ function evaluateCpuCard(player, card) {
       item => item.zodiac === "子"
     ).length;
 
-    // 自分の子を手放す場合は少し慎重
     points -= myRats * 20;
+
   }
 
 
   // =====================================
-  // 8. わずかなランダム性
+  // 9. ランダム性
   // =====================================
 
   points += Math.random() * 3;
 
   return points;
+
 }
 
 
@@ -1494,20 +2017,29 @@ function chooseCpuPlay(player) {
       return;
     }
 
-    // ゲームが終了する場合の勝者
-    const winner = getPredictedWinner(nextField);
 
-    if (winner.id === player.id) {
+    // ===================================
+    // 推理に基づく勝敗予測
+    // ===================================
 
-      // 自分が勝利するカード
+    const scoreDifference =
+      evaluateCpuEnding(
+        player,
+        nextField
+      );
+
+    if (scoreDifference > 0) {
+
+      // 推理上、自分が有利
       winningCards.push(card);
 
     } else {
 
-      // 自分以外が勝利するカード
+      // 推理上、自分が不利または同点
       endingCards.push(card);
 
     }
+
 
   });
 
@@ -1571,6 +2103,7 @@ function chooseCpuPlay(player) {
 
 
 
+
 function chooseCpuPass(player) {
 
   const next = getNextActivePlayer(player.id);
@@ -1579,26 +2112,59 @@ function chooseCpuPass(player) {
     return null;
   }
 
+  // =====================================
+  // 次のプレイヤーの担当色を推理
+  // =====================================
+
+  const probabilities =
+    getCpuColorProbabilities(
+      player.id,
+      next.id
+    );
+
+  // =====================================
+  // 各カードを評価
+  // =====================================
+
   const evaluated = player.hand.map(card => {
 
     let points = 0;
 
-    // 自分の担当色は渡したくない
+    // ===================================
+    // 1. 自分の担当色は渡したくない
+    // ===================================
+
     if (card.color === player.color) {
       points -= 100;
     }
 
-    // 渡す相手の担当色も避ける
-    if (card.color === next.color) {
-      points -= 80;
+    // ===================================
+    // 2. 相手の推理担当色を考慮
+    // ===================================
+
+    if (card.zodiac !== "猫") {
+
+      const probability =
+        probabilities[card.color] || 0;
+
+      // 担当色である可能性が高いほど
+      // 渡す評価を下げる
+      points -= probability * 80;
+
     }
 
-    // 相手が出せるカードは避ける
+    // ===================================
+    // 3. 相手が場に出せるカード
+    // ===================================
+
     if (canPlayCard(card)) {
       points -= 20;
     }
 
-    // 自分の担当色を上書きされる可能性
+    // ===================================
+    // 4. 自分の得点を上書きする危険
+    // ===================================
+
     if (card.zodiac !== "猫") {
 
       const pile = field[card.zodiac];
@@ -1613,38 +2179,63 @@ function chooseCpuPass(player) {
         ) {
           points -= 50;
         }
+
       }
+
     }
 
-    // 猫は状況によって渡す
+    // ===================================
+    // 5. 猫カード
+    // ===================================
+
     if (card.zodiac === "猫") {
       points -= 100;
     }
 
-    points += Math.random() * 3;
+    // ===================================
+    // 6. ランダム性
+    // ===================================
+
+    points += Math.random() * 8;
 
     return {
       card,
       points
     };
+
   });
 
-  // 渡すのに都合がよいカードを優先
+  // =====================================
+  // 評価が高いカードを優先
+  // =====================================
+
   evaluated.sort(
     (a, b) => b.points - a.points
   );
 
+  // =====================================
+  // 判断ログ
+  // =====================================
+
   console.log(
     "CPU受け渡し評価",
     player.name,
-    evaluated.map(item => ({
-      card: item.card.color + item.card.zodiac,
-      points: Math.round(item.points)
-    }))
+    {
+      nextPlayer: next.name,
+      probabilities: probabilities,
+      cards: evaluated.map(item => ({
+        card:
+          item.card.color +
+          item.card.zodiac,
+        points: Math.round(item.points)
+      }))
+    }
   );
 
   return evaluated[0].card;
+
 }
+
 
 
 // ========================================
@@ -1787,15 +2378,30 @@ if (!moved || !isCurrentGame(sessionId)) {
     // 猫の効果中にゲームが変わった場合
     if (!isCurrentGame(sessionId)) return;
 
+
   } else {
 
     // ===================================
     // 通常の干支カード
     // ===================================
 
+    // カードを置く前の山の状態を保存
+    const previousPile = [
+      ...field[card.zodiac]
+    ];
+
+    // CPUが出されたカードを観察して推理
+    observeCpuPlayedCard(
+      player,
+      card,
+      previousPile
+    );
+
+    // 実際にカードを場へ出す
     field[card.zodiac].push(card);
 
     renderField();
+
 
 
     // ===================================
