@@ -34,7 +34,7 @@ let phase = "play";
 let selectedCardId = null;
 let handSort = "zodiac";
 let cpuSpeed = "normal";
-
+let cpuColorPredictions = {};
 
 /* =====================================
    新しく受け取ったカードの強調表示
@@ -262,6 +262,7 @@ turnProcessing = false;
   players = [];
   field = {};
   catPile = [];
+  cpuColorPredictions = {};
 
   selectedCardId = null;
   handSort = "zodiac";
@@ -344,12 +345,18 @@ if (greenScore) {
 // プレイヤー表示
 // ========================================
 
-
 function renderPlayers() {
 
   const positions = {
-    2: { 1: "cpu-top" },
-    3: { 1: "cpu-left", 2: "cpu-right" },
+    2: {
+      1: "cpu-top"
+    },
+
+    3: {
+      1: "cpu-left",
+      2: "cpu-right"
+    },
+
     4: {
       1: "cpu-left",
       2: "cpu-top",
@@ -357,9 +364,14 @@ function renderPlayers() {
     }
   };
 
+  // =====================================
   // CPU表示を初期化
+  // =====================================
+
   ["cpu-top", "cpu-left", "cpu-right"]
-    .forEach(id => $(id).replaceChildren());
+    .forEach(id => {
+      $(id).replaceChildren();
+    });
 
   // =====================================
   // CPUの表示
@@ -373,22 +385,34 @@ function renderPlayers() {
     const panel = document.createElement("div");
     panel.className = "player-panel";
 
+    // =====================================
     // 現在の手番
+    // =====================================
+
     if (player.id === currentPlayerIndex) {
       panel.classList.add("active-turn");
     }
 
+    // =====================================
     // 脱落状態
+    // =====================================
+
     if (player.eliminated) {
       panel.classList.add("eliminated");
     }
 
+    // =====================================
     // CPU名
+    // =====================================
+
     const name = document.createElement("div");
     name.className = "player-name";
     name.textContent = player.name;
 
-    // 手札枚数のみ表示
+    // =====================================
+    // 手札枚数
+    // =====================================
+
     const details = document.createElement("div");
     details.className = "player-details";
 
@@ -399,38 +423,163 @@ function renderPlayers() {
       details.textContent += " ／ 脱落";
     }
 
-    panel.append(name, details);
+    // =====================================
+    // CPU担当色の予想
+    // =====================================
+
+    const prediction =
+      cpuColorPredictions[player.id] || "";
+
+    // 予想した色でパネルを色付け
+    if (prediction) {
+
+      panel.classList.add(
+        `cpu-prediction-${prediction}`
+      );
+
+    }
+
+    // =====================================
+    // 予想色の表示
+    // =====================================
+
+    const predictionText =
+      document.createElement("div");
+
+    predictionText.className =
+      "cpu-prediction-text";
+
+    predictionText.textContent =
+      prediction
+        ? `予想：${prediction}`
+        : "色を予想";
+
+    // =====================================
+    // パネルをタップして色を選択
+    // =====================================
+
+    panel.addEventListener("click", () => {
+
+      showCpuColorPicker(player.id);
+
+    });
+
+    // =====================================
+    // CPUパネルに表示
+    // =====================================
+
+    panel.append(
+      name,
+      details,
+      predictionText
+    );
 
     $(targetId).appendChild(panel);
+
   });
 
   // =====================================
   // 自分の情報
   // =====================================
 
-const me = players[0];
+  const me = players[0];
 
-const myInfo = $("my-info");
+  const myInfo = $("my-info");
 
-myInfo.replaceChildren();
+  myInfo.replaceChildren();
 
-const colorClass = {
-  "赤": "red",
-  "青": "blue",
-  "黄": "yellow",
-  "緑": "green"
-};
+  const colorClass = {
+    "赤": "red",
+    "青": "blue",
+    "黄": "yellow",
+    "緑": "green"
+  };
 
-myInfo.innerHTML = `
-  <span>あなた ／ 担当：</span>
-  <span class="my-color-badge ${colorClass[me.color]}">
-    ${me.color}
-  </span>
-  <span>
-    ／ 手札：${me.hand.length}枚
-    ${me.eliminated ? "／ 脱落" : ""}
-  </span>
-`;
+  myInfo.innerHTML = `
+    <span>あなた ／ 担当：</span>
+    <span class="my-color-badge ${colorClass[me.color]}">
+      ${me.color}
+    </span>
+    <span>
+      ／ 手札：${me.hand.length}枚
+      ${me.eliminated ? "／ 脱落" : ""}
+    </span>
+  `;
+
+}
+
+
+/* ========================================
+   CPU担当色の予想選択
+======================================== */
+
+function showCpuColorPicker(playerId) {
+
+  // 以前の選択画面があれば削除
+  document.getElementById(
+    "cpu-color-picker"
+  )?.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "cpu-color-picker";
+
+  const panel = document.createElement("div");
+  panel.className = "cpu-picker-panel";
+
+  const title = document.createElement("div");
+  title.className = "cpu-picker-title";
+  title.textContent =
+    `CPU ${playerId} の担当色を予想`;
+
+  const buttons = document.createElement("div");
+  buttons.className = "cpu-picker-buttons";
+
+  const colors = playerCount === 2
+    ? ["赤", "青", "黄", "未設定"]
+    : ["赤", "青", "黄", "緑", "未設定"];
+
+  colors.forEach(color => {
+
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "cpu-color-button";
+    button.textContent = color;
+
+    if (color !== "未設定") {
+      button.classList.add(
+        `cpu-choice-${color}`
+      );
+    }
+
+    button.addEventListener("click", () => {
+
+      cpuColorPredictions[playerId] =
+        color === "未設定" ? "" : color;
+
+      overlay.remove();
+
+      renderPlayers();
+
+    });
+
+    buttons.appendChild(button);
+
+  });
+
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.className = "cpu-picker-cancel";
+  cancel.textContent = "キャンセル";
+
+  cancel.addEventListener("click", () => {
+    overlay.remove();
+  });
+
+  panel.append(title, buttons, cancel);
+  overlay.appendChild(panel);
+
+  document.body.appendChild(overlay);
 
 }
 
@@ -2318,7 +2467,7 @@ function showResult() {
 
   const viewBoard = document.createElement("button");
   viewBoard.className = "main-button";
-  viewBoard.textContent = "盤面を見る";
+  viewBoard.textContent = "場を見る";
 
   panel.appendChild(viewBoard);
 
@@ -3860,66 +4009,6 @@ if ("serviceWorker" in navigator) {
 
 }
 
-/* =====================================
-   画面位置の原因調査
-===================================== */
-
-(function () {
-
-  const debug = document.createElement("div");
-
-  debug.style.cssText = `
-    position: fixed;
-    left: 5px;
-    top: 5px;
-    z-index: 999999;
-    padding: 8px;
-    background: rgba(0,0,0,0.9);
-    color: white;
-    font-size: 12px;
-    white-space: pre-line;
-    pointer-events: none;
-  `;
-
-  document.body.appendChild(debug);
-
-  function update() {
-
-    const html = document.documentElement;
-    const body = document.body;
-    const screen = document.getElementById("game-screen");
-    const board = document.getElementById("game-board");
-
-    if (!screen || !board ||
-        screen.classList.contains("hidden")) {
-      debug.style.display = "none";
-      return;
-    }
-
-    debug.style.display = "block";
-
-    const position = element => {
-      const rect = element.getBoundingClientRect();
-      return `${Math.round(rect.top)}～${Math.round(rect.bottom)}`;
-    };
-
-    const parent = screen.offsetParent;
-
-    debug.textContent =
-      `html: ${position(html)}\n` +
-      `body: ${position(body)}\n` +
-      `screen: ${position(screen)}\n` +
-      `board: ${position(board)}\n` +
-      `parent: ${parent?.id || parent?.tagName || "なし"}\n` +
-      `scrollY: ${window.scrollY}\n` +
-      `visualTop: ${window.visualViewport?.offsetTop ?? "なし"}\n` +
-      `pageTop: ${window.visualViewport?.pageTop ?? "なし"}\n` +
-      `innerHeight: ${window.innerHeight}`;
-  }
-
-  setInterval(update, 500);
-
-})();
 
 /* =====================================
    iPhone 画面位置の補正
@@ -3933,3 +4022,548 @@ function resetPagePosition() {
   document.body.scrollTop = 0;
 
 }
+
+/* ========================================
+   CPU速度の表示更新
+======================================== */
+
+const cpuSpeedSelect =
+  document.getElementById("cpu-speed");
+
+const cpuSpeedLabel =
+  document.querySelector(".speed-control label");
+
+function updateCpuSpeedLabel() {
+
+  const selectedText =
+    cpuSpeedSelect.options[
+      cpuSpeedSelect.selectedIndex
+    ].textContent;
+
+  cpuSpeedLabel.textContent =
+    "CPU速度：" + selectedText;
+
+}
+
+cpuSpeedSelect.addEventListener(
+  "change",
+  updateCpuSpeedLabel
+);
+
+updateCpuSpeedLabel();
+
+
+
+/* ========================================
+   干支のはなし
+======================================== */
+
+const etoStoryPages = [
+
+  // =====================================
+  // 1ページ目：十二支の説明
+  // =====================================
+
+  {
+    title: "十二支とは？",
+    text: `
+      <p>
+        十二支は、子・丑・寅・卯・辰・巳・
+        午・未・申・酉・戌・亥の12種類です。
+      </p>
+
+      <p>
+        日本では、それぞれに動物が
+        当てはめられています。
+      </p>
+
+      <h3>十二支の動物たち</h3>
+
+
+<div class="eto-animal-list">
+
+  <span><strong>子（ね）</strong>ネズミ</span>
+  <span><strong>丑（うし）</strong>ウシ</span>
+  <span><strong>寅（とら）</strong>トラ</span>
+
+  <span><strong>卯（う）</strong>ウサギ</span>
+  <span><strong>辰（たつ）</strong>龍</span>
+  <span><strong>巳（み）</strong>ヘビ</span>
+
+  <span><strong>午（うま）</strong>ウマ</span>
+  <span><strong>未（ひつじ）</strong>ヒツジ</span>
+  <span><strong>申（さる）</strong>サル</span>
+
+  <span><strong>酉（とり）</strong>ニワトリ</span>
+  <span><strong>戌（いぬ）</strong>イヌ</span>
+  <span><strong>亥（い）</strong>イノシシ</span>
+
+</div>
+
+
+      <p>
+        どうして、この順番になったのでしょうか？
+      </p>
+
+      <p>
+        動物たちにまつわる昔話を
+        読んでみましょう。
+      </p>
+    `
+  },
+
+  // =====================================
+  // 2ページ目：神様のお知らせ
+  // =====================================
+
+  {
+    title: "神様からのお知らせ",
+    text: `
+      <p>
+        むかしむかし、神様が動物たちを
+        集めて言いました。
+      </p>
+
+      <p>
+        「新しい年の最初の日、
+        わしのところへ来なさい。
+        早く着いた十二匹を、
+        一年ずつその年の代表にしてあげよう」
+      </p>
+
+      <p>
+        動物たちは大喜び。
+      </p>
+
+      <p>
+        誰が一番になるのか、
+        みんな張り切っていました。
+      </p>
+    `
+  },
+
+  // =====================================
+  // 3ページ目：ネズミと牛
+  // =====================================
+
+  {
+    title: "ウシの頭に乗ったネズミ",
+    text: `
+      <p>
+        ウシは、自分が歩くのが遅いことを
+        知っていたので、
+        まだ暗いうちから出発しました。
+      </p>
+
+      <p>
+        それを見ていたネズミは、
+        こっそりウシの頭に乗りました。
+      </p>
+
+      <p>
+        ウシは一生懸命歩き、
+        とうとう神様の門の前に
+        たどり着きました。
+      </p>
+
+      <p>
+        ところが、門が開いたその瞬間！
+      </p>
+
+      <p>
+        ネズミがウシの頭から
+        ぴょんと飛び降り、
+        真っ先に神様のところへ
+        駆け込みました。
+      </p>
+
+      <p>
+        こうして、
+        <strong>一番はネズミ、
+        二番はウシ</strong>になったのです。
+      </p>
+    `
+  },
+
+  // =====================================
+  // 4ページ目：龍とヘビ
+  // =====================================
+
+  {
+    title: "龍に道を譲ったヘビ",
+    text: `
+      <p>
+        続いて、トラとウサギが
+        やって来ました。
+      </p>
+
+      <p>
+        そのあとを、空を飛ぶ龍と
+        地面を進むヘビが追いかけていました。
+      </p>
+
+      <p>
+        ヘビは龍が近づいてくるのを見ると、
+        道を空けて言いました。
+      </p>
+
+      <p>
+        「龍さん、お先にどうぞ」
+      </p>
+
+      <p>
+        龍は「ありがとう」とお礼を言って、
+        先に神様のところへ向かいました。
+      </p>
+
+      <p>
+        こうして、
+        <strong>五番は龍、
+        六番はヘビ</strong>になりました。
+      </p>
+    `
+  },
+
+  // =====================================
+  // 5ページ目：サル・イヌ・ニワトリ
+  // =====================================
+
+  {
+    title: "サルとイヌの大げんか",
+    text: `
+      <p>
+        そのころ、サルとイヌは、
+        どちらが先に進むかで
+        大げんかをしていました。
+      </p>
+
+      <p>
+        「おれが先だ！」
+      </p>
+
+      <p>
+        「いや、ぼくが先だ！」
+      </p>
+
+      <p>
+        二匹は言い争い、
+        とうとう足を止めてしまいました。
+      </p>
+
+      <p>
+        そこへニワトリがやって来ました。
+      </p>
+
+      <p>
+        「けんかしている場合じゃないよ！
+        早く行かないと間に合わないよ！」
+      </p>
+
+      <p>
+        ニワトリは二匹の間に入り、
+        けんかを止めました。
+      </p>
+
+      <p>
+        三匹は再び走り出しましたが、
+        その間にウマとヒツジが
+        先へ進んでいました。
+      </p>
+
+      <p>
+        こうして、
+        <strong>九番はサル、
+        十番はニワトリ、
+        十一番はイヌ</strong>になりました。
+      </p>
+    `
+  },
+
+  // =====================================
+  // 6ページ目：イノシシ
+  // =====================================
+
+  {
+    title: "走りすぎたイノシシ",
+    text: `
+      <p>
+        実は、誰よりも勢いよく走っていた
+        動物がいました。
+      </p>
+
+      <p>
+        それはイノシシです。
+      </p>
+
+      <p>
+        「一番はおれだー！」
+      </p>
+
+      <p>
+        イノシシはものすごい速さで
+        神様の門へ向かいました。
+      </p>
+
+      <p>
+        ところが、あまりに勢いがよすぎて、
+        門の前を通り過ぎてしまったのです！
+      </p>
+
+      <p>
+        「あれっ！？ 神様のところはどこだ！？」
+      </p>
+
+      <p>
+        慌てて引き返したイノシシでしたが、
+        その間にほかの動物たちが
+        次々と到着していました。
+      </p>
+
+      <p>
+        ようやく神様のところへ着いたときには、
+        <strong>十二番目</strong>。
+      </p>
+
+      <p>
+        こうしてイノシシは、
+        十二支の最後になったのでした。
+      </p>
+    `
+  },
+
+  // =====================================
+  // 7ページ目：猫
+  // =====================================
+
+  {
+    title: "十三番目にやって来たネコ",
+    text: `
+      <p>
+        神様が動物たちを集めたとき、
+        ネコは大切なことを
+        聞き逃してしまいました。
+      </p>
+
+      <p>
+        「神様のところへ行くのは、
+        いつだったかな？」
+      </p>
+
+      <p>
+        困ったネコはネズミに尋ねました。
+      </p>
+
+      <p>
+        するとネズミは、
+        いたずらを思いつきました。
+      </p>
+
+      <p>
+        「神様のところへ行くのは、
+        二日目の朝だよ！」
+      </p>
+
+      <p>
+        本当は新しい年の最初の日なのに、
+        ネズミはわざと間違った日を教えたのです。
+      </p>
+
+      <p>
+        何も知らないネコは、
+        ネズミの言葉を信じて
+        その日を待ちました。
+      </p>
+
+      <p>
+        そして二日目の朝。
+      </p>
+
+      <p>
+        「よーし、十二支の仲間になるぞ！」
+      </p>
+
+      <p>
+        ネコは張り切って
+        神様のところへ向かいました。
+      </p>
+
+      <p>
+        ところが、到着すると、
+        すでに十二匹の動物たちが
+        並んでいました。
+      </p>
+
+      <p>
+        「残念じゃが、十二支は
+        昨日決まってしまったぞ」
+      </p>
+
+      <p>
+        「ええっ！？ ネズミは
+        今日だと言っていたのに！」
+      </p>
+
+      <p>
+        ネコは十三番目にやって来たため、
+        十二支に入ることができませんでした。
+      </p>
+
+      <p>
+        しかも、ネズミは一番になっていました。
+      </p>
+
+      <p>
+        「ネズミめ！ よくもだましたな！」
+      </p>
+
+      <p>
+        怒ったネコは、
+        ネズミを追いかけ始めました。
+      </p>
+
+      <p>
+        こうして、ネコがネズミを
+        追いかけるようになったと
+        いわれています。
+      </p>
+
+      <p class="eto-story-ending">
+        子・丑・寅・卯・辰・巳<br>
+        午・未・申・酉・戌・亥
+      </p>
+
+      <p class="eto-story-ending">
+        おしまい
+      </p>
+    `
+  }
+
+];
+
+
+/* ========================================
+   現在のページ
+======================================== */
+
+let etoStoryIndex = 0;
+
+
+/* ========================================
+   ページ表示
+======================================== */
+
+function renderEtoStory() {
+
+  const page = etoStoryPages[etoStoryIndex];
+
+  const content =
+    document.getElementById("eto-story-content");
+
+  content.innerHTML = `
+    <h3>${page.title}</h3>
+    ${page.text}
+  `;
+
+  // ページ番号
+  document.getElementById("eto-story-page")
+    .textContent =
+      `${etoStoryIndex + 1} / ${etoStoryPages.length}`;
+
+  // 前へボタン
+  document.getElementById("eto-story-prev")
+    .disabled = etoStoryIndex === 0;
+
+  // 次へボタン
+  const nextButton =
+    document.getElementById("eto-story-next");
+
+  nextButton.textContent =
+    etoStoryIndex === etoStoryPages.length - 1
+      ? "終わり"
+      : "次へ";
+
+  // ページを切り替えたら先頭へ
+  content.scrollTop = 0;
+
+}
+
+
+/* ========================================
+   干支のはなしを開く
+======================================== */
+
+document
+  .getElementById("eto-story-button")
+  .addEventListener("click", () => {
+
+    etoStoryIndex = 0;
+
+    renderEtoStory();
+
+    document
+      .getElementById("eto-story-overlay")
+      .classList.remove("hidden");
+
+  });
+
+
+/* ========================================
+   前へ
+======================================== */
+
+document
+  .getElementById("eto-story-prev")
+  .addEventListener("click", () => {
+
+    if (etoStoryIndex > 0) {
+
+      etoStoryIndex--;
+
+      renderEtoStory();
+
+    }
+
+  });
+
+
+/* ========================================
+   次へ
+======================================== */
+
+document
+  .getElementById("eto-story-next")
+  .addEventListener("click", () => {
+
+    if (
+      etoStoryIndex <
+      etoStoryPages.length - 1
+    ) {
+
+      etoStoryIndex++;
+
+      renderEtoStory();
+
+    } else {
+
+      document
+        .getElementById("eto-story-overlay")
+        .classList.add("hidden");
+
+    }
+
+  });
+
+
+/* ========================================
+   閉じる
+======================================== */
+
+document
+  .getElementById("eto-story-close")
+  .addEventListener("click", () => {
+
+    document
+      .getElementById("eto-story-overlay")
+      .classList.add("hidden");
+
+  });

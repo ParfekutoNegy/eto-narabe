@@ -66,72 +66,82 @@
          対戦設定画面
     ===================================== -->
 
-    <section id="setup-screen" class="screen">
 
-      <div class="setup-panel">
+<!-- =====================================
+     トップ画面
+===================================== -->
 
-        <h1>干支並べ</h1>
+<section id="setup-screen" class="screen">
 
-        <h2>対戦人数</h2>
+  <div class="setup-panel">
 
-        <div class="player-options">
+    <h1 class="setup-title">干支並べ</h1>
 
-          <button
-            class="player-option"
-            data-players="2"
-            type="button"
-          >
-            2人
-            <span>CPU 1人</span>
-          </button>
+    <h2 class="setup-heading">対戦人数</h2>
 
-          <button
-            class="player-option"
-            data-players="3"
-            type="button"
-          >
-            3人
-            <span>CPU 2人</span>
-          </button>
+    <div class="player-options">
 
-          <button
-            class="player-option active"
-            data-players="4"
-            type="button"
-          >
-            4人
-            <span>CPU 3人</span>
-          </button>
+      <button
+        class="player-option"
+        data-players="2"
+        type="button"
+        aria-label="2人対戦"
+      >
+        2人
+      </button>
 
-        </div>
+      <button
+        class="player-option"
+        data-players="3"
+        type="button"
+        aria-label="3人対戦"
+      >
+        3人
+      </button>
 
-        <p id="setup-description">
-          4人対戦 ／ 手札13枚ずつ
-        </p>
+      <button
+        class="player-option active"
+        data-players="4"
+        type="button"
+        aria-label="4人対戦"
+      >
+        4人
+      </button>
 
-        <!-- ゲーム開始 -->
+    </div>
 
-        <button
-          id="start-button"
-          class="main-button"
-          type="button"
-        >
-          ゲーム開始
-        </button>
+    <p id="setup-description">
+      4人対戦 ／ 手札13枚ずつ
+    </p>
 
-        <!-- 新規追加：ルール説明 -->
+    <button
+      id="start-button"
+      class="main-button"
+      type="button"
+    >
+      ゲーム開始
+    </button>
 
-        <button
-          id="rules-button"
-          class="main-button"
-          type="button"
-        >
-          遊び方・ルール説明
-        </button>
+    <button
+      id="rules-button"
+      class="main-button"
+      type="button"
+    >
+      遊び方説明
+    </button>
 
-      </div>
+    <button
+      id="eto-story-button"
+      class="main-button"
+      type="button"
+    >
+      干支のはなし
+    </button>
 
-    </section>
+  </div>
+
+</section>
+
 
 
     <!-- =====================================
@@ -149,92 +159,115 @@
              上部エリア
         ================================= -->
 
-        <header class="top-area">
+<!-- =================================
+     上部エリア
+================================= -->
 
-          <!-- 左側：戻る・得点 -->
+<header class="top-area">
 
-          <div class="top-left">
+  <!-- =================================
+       左側：現在の得点
+  ================================= -->
 
-            <button
-              id="back-button"
-              class="small-button"
-              type="button"
-            >
-              戻る
-            </button>
+  <div class="top-left">
 
-            <div id="color-counts">
+    <span class="score-heading">
+      現在の得点
+    </span>
 
-              <span class="count-red">
-                赤
-                <b id="count-red">0</b>
-              </span>
+    <div id="color-counts">
 
-              <span class="count-blue">
-                青
-                <b id="count-blue">0</b>
-              </span>
+      <span class="count-red">
+        赤
+        <b id="count-red">0</b>
+      </span>
 
-              <span class="count-yellow">
-                黄
-                <b id="count-yellow">0</b>
-              </span>
+      <span class="count-blue">
+        青
+        <b id="count-blue">0</b>
+      </span>
 
-              <span class="count-green">
-                緑
-                <b id="count-green">0</b>
-              </span>
+      <span class="count-yellow">
+        黄
+        <b id="count-yellow">0</b>
+      </span>
 
-            </div>
+      <span class="count-green">
+        緑
+        <b id="count-green">0</b>
+      </span>
 
-          </div>
+    </div>
 
-
-          <!-- 中央：CPU2 -->
-
-          <div id="cpu-top"></div>
+  </div>
 
 
-          <!-- 右側：特殊カード説明・CPU速度 -->
+  <!-- =================================
+       中央：CPU2
+  ================================= -->
 
-          <div class="top-right">
+  <div id="cpu-top"></div>
 
-            <button
-              id="special-rules-button"
-              class="small-button"
-              type="button"
-            >
-              特殊カード説明
-            </button>
 
-            <div class="speed-control">
+  <!-- =================================
+       右側：操作ボタン
+  ================================= -->
 
-              <span>CPU速度</span>
+<!-- =================================
+     右上：操作ボタン
+================================= -->
 
-              <select id="cpu-speed">
+<div class="top-right">
 
-                <option value="fast">
-                  高速
-                </option>
+  <!-- 特殊カード説明 -->
 
-                <option
-                  value="normal"
-                  selected
-                >
-                  標準
-                </option>
+  <button
+    id="special-rules-button"
+    class="small-button"
+    type="button"
+  >
+    特殊カード説明
+  </button>
 
-                <option value="slow">
-                  低速
-                </option>
+  <!-- CPU速度 -->
 
-              </select>
+  <div class="speed-control">
 
-            </div>
+    <label for="cpu-speed">
+      CPU速度：
+    </label>
 
-          </div>
+    <select id="cpu-speed">
 
-        </header>
+      <option value="fast">
+        高速
+      </option>
+
+      <option value="normal" selected>
+        標準
+      </option>
+
+      <option value="slow">
+        低速
+      </option>
+
+    </select>
+
+  </div>
+
+  <!-- 戻る -->
+
+  <button
+    id="back-button"
+    class="small-button"
+    type="button"
+  >
+    戻る
+  </button>
+
+</div>
+
+</header>
 
 
         <!-- =================================
@@ -810,6 +843,60 @@
     </div>
 
   </div>
+
+  
+
+<!-- =====================================
+     干支のはなし
+===================================== -->
+
+
+<!-- =====================================
+     干支のはなし
+===================================== -->
+
+<div id="eto-story-overlay" class="hidden">
+
+  <div class="eto-story-panel">
+
+    <!-- 物語の表示領域 -->
+    <div
+      class="eto-story-content"
+      id="eto-story-content"
+    ></div>
+
+    <!-- 下部操作エリア -->
+    <div class="eto-story-footer">
+
+      <!-- 左側：ページ切り替え -->
+      <div class="eto-story-navigation">
+
+        <button id="eto-story-prev" type="button">
+          前へ
+        </button>
+
+        <span id="eto-story-page">
+          1 / 7
+        </span>
+
+        <button id="eto-story-next" type="button">
+          次へ
+        </button>
+
+      </div>
+
+      <!-- 右側：閉じる -->
+      <button id="eto-story-close" type="button">
+        閉じる
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
 
 
   <!-- =====================================
