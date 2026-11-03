@@ -3306,3 +3306,48 @@ body {
     0 4px 0 #064126,
     0 6px 10px rgba(0, 0, 0, 0.35);
 }
+
+
+/* ========================================
+   遊び方・干支のはなし 文字サイズ調整
+======================================== */
+
+/* 遊び方：タイトル */
+#rules-overlay .rules-panel h2 {
+  font-size: 34px;
+}
+
+/* 遊び方：見出し */
+#rules-overlay .rules-content h3 {
+  font-size: 26px;
+}
+
+/* 遊び方：説明文 */
+#rules-overlay .rules-content p {
+  font-size: 22px;
+}
+
+/* 遊び方：特殊カード名 */
+#rules-overlay .rule-special-section .rule-special-item strong {
+  font-size: 25px;
+}
+
+/* 遊び方：特殊カード説明 */
+#rules-overlay .rule-special-section .rule-special-item p {
+  font-size: 22px;
+}
+
+/* 干支のはなし：タイトル */
+#eto-story-overlay .eto-story-panel h2 {
+  font-size: 36px;
+}
+
+/* 干支のはなし：本文 */
+#eto-story-overlay .eto-story-content {
+  font-size: 24px;
+}
+
+/* 干支のはなし：小見出し */
+#eto-story-overlay .eto-story-content h3 {
+  font-size: 28px;
+}
