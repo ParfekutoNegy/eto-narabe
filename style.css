@@ -298,12 +298,7 @@ button {
     400px
     214px;
 
-  background:
-    radial-gradient(
-      ellipse at center,
-      #315a42,
-      #172d23
-    );
+  background: #303438;
 
   overflow: hidden;
   transform-origin: top left;
@@ -619,7 +614,7 @@ button {
 #game-message {
   color: #ffe08a;
 
-  font-size: 23px;
+  font-size: 26px;
   font-weight: bold;
 
   text-align: center;
@@ -1170,18 +1165,36 @@ button {
    17. CPU色選択画面
 ======================================== */
 
-#cpu-color-picker {
-  position: fixed;
-  inset: 0;
+
+/* ========================================
+   17. CPU色選択画面
+======================================== */
+
+#game-board > #cpu-color-picker {
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: auto;
+  bottom: auto;
+
+  width: 100%;
+  height: 100%;
 
   z-index: 30000;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
   background: rgba(0, 0, 0, 0.65);
+
+  transform: none;
+
 }
+
 
 .cpu-picker-panel {
   width: max-content;
@@ -3072,5 +3085,16 @@ button {
   justify-content: center;
 
   z-index: 9999;
+
+}
+
+/* ========================================
+   CPU担当色予想画面の拡大
+======================================== */
+
+#game-board .cpu-picker-panel {
+
+  transform: scale(2.0);
+  transform-origin: center center;
 
 }

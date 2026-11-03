@@ -257,6 +257,7 @@ busy = false;
 turnProcessing = false;
 
   $("result-overlay")?.remove();
+  $("return-result-button")?.remove();
 
   cardSequence = 0;
   players = [];
@@ -2988,10 +2989,20 @@ $("back-button").addEventListener("click", () => {
   // 次のSTEPで強化します。
   gameOver = true;
 
-  $("result-overlay")?.remove();
+// ゲーム結果画面を削除
+$("result-overlay")?.remove();
 
-  $("game-screen").classList.add("hidden");
-  $("setup-screen").classList.remove("hidden");
+// ゲーム結果画面に戻るボタンも削除
+$("return-result-button")?.remove();
+
+// 色予想画面が残っていた場合も削除
+$("cpu-color-picker")?.remove();
+
+// ゲーム画面を閉じる
+$("game-screen").classList.add("hidden");
+
+// ホーム画面を表示
+$("setup-screen").classList.remove("hidden");
 });
 
 // ========================================
