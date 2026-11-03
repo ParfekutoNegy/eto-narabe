@@ -2996,15 +2996,6 @@ await showSpecialEffect(
 
   renderAll();
 
-  // =====================================
-  // 9. 完了メッセージ
-  // =====================================
-
-  await showSpecialEffect(
-    "子（ね）の移動が完了しました",
-    1000
-  );
-
   if (!isCurrentGame(sessionId)) {
     return;
   }
@@ -3225,12 +3216,15 @@ function checkGameEnd() {
     activePlayers.length <= 1
   ) {
 
-    gameOver = true;
-    busy = false;
-    turnProcessing = false;
+gameOver = true;
+busy = false;
+turnProcessing = false;
 
-    // 最終盤面を描画
-    renderAll();
+// 最終盤面を描画
+renderAll();
+
+// 案内表示を「ゲーム終了」に変更
+showMessage("ゲーム終了");
 
     // 現在のゲーム番号を保存
     const sessionId = gameSessionId;
@@ -5288,12 +5282,7 @@ const etoStoryPages = [
       <p>
         こうして、ネコがネズミを
         追いかけるようになったと
-        いわれています。
-      </p>
-
-      <p class="eto-story-ending">
-        子・丑・寅・卯・辰・巳<br>
-        午・未・申・酉・戌・亥
+        言われています。
       </p>
 
       <p class="eto-story-ending">
