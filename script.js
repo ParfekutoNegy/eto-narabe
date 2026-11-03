@@ -3872,11 +3872,13 @@ $("cpu-speed").addEventListener("change", event => {
 
 $("back-button").addEventListener("click", () => {
 
-    stopCurrentGame();
-
+  // 先に確認する
   if (!confirm("対戦を終了して戻りますか？")) {
     return;
   }
+
+  // OKが押された場合だけゲームを停止
+  stopCurrentGame();
 
   // 実行中の非同期処理を止める処理は
   // 次のSTEPで強化します。

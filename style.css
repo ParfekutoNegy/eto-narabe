@@ -3308,6 +3308,33 @@ body {
 }
 
 
+
+/* ========================================
+   Safariの文字サイズ自動調整を無効化
+======================================== */
+
+html,
+body,
+#app {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* 遊び方の説明 */
+#rules-overlay,
+#rules-overlay * {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* 干支のはなし */
+#eto-story-overlay,
+#eto-story-overlay * {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+
 /* ========================================
    遊び方・干支のはなし 文字サイズ調整
 ======================================== */
@@ -3350,4 +3377,19 @@ body {
 /* 干支のはなし：小見出し */
 #eto-story-overlay .eto-story-content h3 {
   font-size: 28px;
+}
+
+
+/* ========================================
+   スクロール案内の文字サイズ調整
+======================================== */
+
+/* 「下にスクロールして」の文字 */
+#rules-overlay .rules-scroll-hint {
+  font-size: 17px;
+}
+
+/* 下向き矢印 */
+#rules-overlay .rules-scroll-arrow {
+  font-size: 20px;
 }
