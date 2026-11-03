@@ -4231,16 +4231,21 @@ function showCatRevealModal(transfers) {
     // 公開カードの表示
     // =====================================
 
-    if (transfers.length === 0) {
 
-      const empty = document.createElement("p");
+if (transfers.length === 0) {
 
-      empty.textContent =
-        "子（ね）を持っているプレイヤーはいません。";
+  const empty = document.createElement("p");
 
-      container.appendChild(empty);
+  empty.className = "cat-reveal-empty";
 
-    } else {
+  empty.textContent =
+    "子（ね）を持っているプレイヤーはいません。";
+
+  // 作成した文章を画面に追加
+  container.appendChild(empty);
+
+} else {
+
 
       transfers.forEach(transfer => {
 

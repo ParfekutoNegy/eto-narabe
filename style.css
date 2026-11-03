@@ -3393,3 +3393,23 @@ body,
 #rules-overlay .rules-scroll-arrow {
   font-size: 20px;
 }
+
+
+
+/* ========================================
+   猫の効果：説明文を大きくする
+======================================== */
+
+/* 各プレイヤーの子を公開します */
+#reveal-overlay #reveal-description {
+  font-size: 22px !important;
+  line-height: 1.5;
+}
+
+/* 子を持っているプレイヤーがいない場合 */
+#reveal-overlay .cat-reveal-empty {
+  font-size: 22px !important;
+  font-weight: normal;
+  line-height: 1.5;
+  text-align: center;
+}
