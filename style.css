@@ -3413,3 +3413,58 @@ body,
   line-height: 1.5;
   text-align: center;
 }
+
+
+/* ========================================
+   ゲーム終了画面：担当色ラベル
+======================================== */
+
+#result-overlay .result-player-name,
+#result-overlay .result-winner-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 共通デザイン */
+#result-overlay .result-color-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 44px;
+  height: 32px;
+  padding: 0 8px;
+
+  border-radius: 5px;
+  border: 2px solid rgba(255,255,255,0.6);
+
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+/* 赤 */
+#result-overlay .result-color-赤 {
+  background: #d93636;
+  color: #ffffff;
+}
+
+/* 青 */
+#result-overlay .result-color-青 {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* 黄 */
+#result-overlay .result-color-黄 {
+  background: var(--game-yellow);
+  color: #000000;
+}
+
+/* 緑 */
+#result-overlay .result-color-緑 {
+  background: #229954;
+  color: #ffffff;
+}

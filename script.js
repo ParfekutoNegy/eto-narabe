@@ -948,16 +948,45 @@ if (greenScore) {
   const assignedColors =
     shuffle(availableColors).slice(0, playerCount);
 
-  players = Array.from(
-    { length: playerCount },
-    (_, index) => ({
-      id: index,
-      name: index === 0 ? "あなた" : `CPU ${index}`,
-      color: assignedColors[index],
-      hand: [],
-      eliminated: false
-    })
-  );
+
+/* ========================================
+   対戦人数ごとのCPU表示名
+======================================== */
+
+const cpuNames = {
+  2: {
+    1: "CPU"
+  },
+  3: {
+    1: "CPU（左）",
+    2: "CPU（右）"
+  },
+  4: {
+    1: "CPU（左）",
+    2: "CPU（前）",
+    3: "CPU（右）"
+  }
+};
+
+/* ========================================
+   プレイヤー作成
+======================================== */
+
+players = Array.from(
+  { length: playerCount },
+  (_, index) => ({
+    id: index,
+
+    name: index === 0
+      ? "あなた"
+      : cpuNames[playerCount][index],
+
+    color: assignedColors[index],
+    hand: [],
+    eliminated: false
+  })
+);
+
 
     initializeCpuColorBeliefs();
 
@@ -1152,7 +1181,7 @@ function renderPlayers() {
   };
 
   myInfo.innerHTML = `
-    <span>あなた ／ 担当：</span>
+    <span>あなた ／ 色：</span>
     <span class="my-color-badge ${colorClass[me.color]}">
       ${me.color}
     </span>
@@ -1182,10 +1211,20 @@ function showCpuColorPicker(playerId) {
   const panel = document.createElement("div");
   panel.className = "cpu-picker-panel";
 
-  const title = document.createElement("div");
-  title.className = "cpu-picker-title";
-  title.textContent =
-    `CPU ${playerId} の担当色を予想`;
+
+const title = document.createElement("div");
+
+title.className = "cpu-picker-title";
+
+// 対象CPUの名前を取得
+const targetPlayer = players.find(
+  player => player.id === playerId
+);
+
+// 対戦人数に応じた名前を表示
+title.textContent =
+  `${targetPlayer?.name || "CPU"}の色を予想`;
+
 
   const buttons = document.createElement("div");
   buttons.className = "cpu-picker-buttons";
@@ -1665,14 +1704,41 @@ $("play-button").addEventListener("click", async () => {
       return;
     }
 
-  } else if (!canPlayCard(card)) {
+
+} else if (!canPlayCard(card)) {
+
+  // 子：丑が場にない場合
+  if (
+    card.zodiac === "子" &&
+    field["丑"].length === 0
+  ) {
+
+    showMessage(
+      "子（ね）カードは丑（うし）カードが場に無いと出せません"
+    );
+
+  // 巳：辰の枚数が足りない場合
+  } else if (
+    card.zodiac === "巳" &&
+    field["巳"].length + 1 >
+    field["辰"].length
+  ) {
+
+    showMessage(
+      "巳（み）カードは辰（たつ）カードより多く場に出せません"
+    );
+
+  } else {
 
     showMessage(
       "このカードはまだ出せません"
     );
 
-    return;
   }
+
+  return;
+}
+
 
   // =====================================
   // 操作ロック
@@ -3302,6 +3368,25 @@ function getWinner() {
 // 結果画面
 // ========================================
 
+/* ========================================
+   ゲーム結果用の担当色ラベル
+======================================== */
+
+function createResultColorBadge(color) {
+
+  const badge = document.createElement("span");
+
+  badge.className = "result-color-badge";
+
+  badge.classList.add(
+    `result-color-${color}`
+  );
+
+  badge.textContent = color;
+
+  return badge;
+}
+
 
 
 function showResult() {
@@ -3325,9 +3410,15 @@ function showResult() {
   const title = document.createElement("h2");
   title.textContent = "ゲーム終了";
 
-  const winnerText = document.createElement("h3");
-  winnerText.textContent =
-    `勝者：${winner.name}（${winner.color}）`;
+
+const winnerText = document.createElement("h3");
+winnerText.className = "result-winner-text";
+
+winnerText.append(
+  document.createTextNode(`勝者：${winner.name}`),
+  createResultColorBadge(winner.color)
+);
+
 
   panel.append(title, winnerText);
 
@@ -3344,9 +3435,15 @@ function showResult() {
       row.classList.add("winner");
     }
 
-    const name = document.createElement("span");
-    name.textContent =
-      `${player.name}（${player.color}）`;
+
+const name = document.createElement("span");
+name.className = "result-player-name";
+
+name.append(
+  document.createTextNode(player.name),
+  createResultColorBadge(player.color)
+);
+
 
     const score = document.createElement("span");
     score.textContent =
