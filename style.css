@@ -3468,3 +3468,39 @@ body,
   background: #229954;
   color: #ffffff;
 }
+
+
+/* ========================================
+   並び替えボタンとアクションボタンの幅統一
+======================================== */
+
+/* 並び替えボタン2つの合計幅 */
+.hand-controls {
+  display: flex;
+  width: 145px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* 干支順・色順を同じ幅にする */
+#sort-zodiac,
+#sort-color {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+
+  padding-left: 0;
+  padding-right: 0;
+
+  text-align: center;
+}
+
+/* 場に出す・カードを渡すの幅 */
+.action-buttons {
+  width: 145px;
+}
+
+#play-button,
+#pass-button {
+  width: 100%;
+}
